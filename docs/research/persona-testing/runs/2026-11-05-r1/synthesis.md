@@ -41,7 +41,7 @@ listening or thinking-aloud time, so treat them as lower bounds.
 | 5 | Birth order isn't kept: new siblings always go to the right, and Reformat put the son (11) left of the daughter (14) | P1, P2, P3, P4, P6, P7, P8 | Major (Bennett: oldest on the left) | Order siblings by age/DOB when known, in both add and Reformat |
 | 6 | A second condition defaults to the same colour, quarter and pattern as the first, so breast and ovarian cancer look identical unless changed | P3, P5, P6 | Major (P5 failed S2) | Give each new legend entry the next free quarter and a distinct pattern |
 | 7 | Lines of descent and sibship lines run through labels (Sarah's "BRCA2", the grandmother's note, the twin "?") | P2, P4, P6, P7, P8 | Minor to Major | Reserve label space in layout, or route lines around text |
-| 8 | Shared clinic PC: reopening the tab silently restores the named family; no visible "close patient" or "clear"; no privacy statement to give IT | P3 | Major (H4, H6) | "Close and clear" action, optional no-autosave mode, a one-page data-flow statement linked from the app |
+| 8 | Shared clinic PC: reopening the tab silently restores the named family; no visible "close patient" or "clear"; no privacy statement to give IT | P3 | Major (H5) | "Close and clear" action, optional no-autosave mode, a one-page data-flow statement linked from the app |
 | 9 | `.ped` export has only IDs, sex and one affected flag (no ages, conditions, deceased, twins); no CanRisk export | P1, P3 | Major (feature gap; re-entry stays) | Richer export: CanRisk format first, then the formats Progeny/TrakGene import |
 | 10 | Adding a second partner can place her exactly on top of an existing person; Reformat then merged two sibships into one interleaved line | P8 | Major (temporary misleading state) | Collision check on add; regression fixture for multi-partner + consanguinity in `src/utils/__fixtures__/pedigrees.ts` |
 | 11 | Individual numbers (III-2) change on every relayout | P8 | Minor | Keep numbering stable or warn that it changed |
@@ -68,14 +68,16 @@ were corrected.
 
 ## 2. Hypothesis table
 
-Pending interviews. Usability evidence so far, synthetic:
+Pending interviews. Uses hypotheses v2 (see `evidence.md`). Usability evidence so far, synthetic:
 
 - **H1 (faster than paper):** not supported. Parity at best, because of
   double-entry annotation. Real paper times must come from humans.
-- **H2 (PDF is enough):** at risk. A 20 MB raster PDF may exceed EHR attachment
+- **H3 (PDF is enough, within size limits):** at risk. A 20 MB raster PDF may exceed EHR attachment
   limits (P3), and it drops generation numerals.
-- **H6 (shared PC):** confirmed as a product gap; whether it is a real
-  problem depends on real hospital PCs.
+- **H5 (bottom-up route, incl. shared PCs):** the shared-PC gap is real in
+  the product; whether it matters depends on real hospital PCs and IT.
+- **H8 (trust):** at risk. All eight would have filed a result that reads
+  "BRCA2" without "VUS" unless they noticed and worked around it.
 
 ## 3. Sharpened interview guide
 

@@ -1,7 +1,7 @@
 # Usability protocol
 
 Version: **1** (2026-11-05). Mirrors the 15-minute usability task of the
-[interview guide](https://claude.ai/artifact/KtSAaqBMXinSnu7dPCyxvW) and tests H1
+[interview guide](https://claude.ai/artifact/KtSAaqBMXinSnu7dPCyxvW) and tests H1 and H8
 plus Bennett/NSGC correctness.
 
 ## Target
@@ -56,10 +56,10 @@ The answer key is in [`answer-key.md`](answer-key.md). Agents running a test mus
 |---|---|---|
 | P1 | Find a way to get this family into CanRisk; produce a PDF for a referral letter | E23, E27 |
 | P2 | Export an image for a slide; check it at full size | E8 |
-| P3 | Find out where the data is stored; close the tab, reopen, and see what remains | H4, H6 |
+| P3 | Find out where the data is stored; close the tab, reopen, and see what remains | H5 |
 | P4 | Export SVG or PDF; check every symbol in the legend and on canvas | E8 |
 | P5 | Main task only, with a 5-minute budget | E6 |
-| P6 | Compare against pen speed; look for anything that imports a paper drawing | H1, E31 |
+| P6 | Compare against pen speed; look for anything that imports a paper drawing | H1, H10 |
 | P7 | Add a miscarriage at 10 weeks and a stillbirth at 30 weeks to Sarah's partnership | Pregnancy notation |
 | P8 | Make Sarah's daughter's future partner a first cousin (consanguinity); add a half-sibling | E7 |
 

@@ -15,7 +15,7 @@ guide for the human interviews.
 | Input | Where | Used for |
 |---|---|---|
 | Desk research | [Claude Doc](https://claude.ai/artifact/HcgwAkFxgCB2exrVKmz9jk), distilled into [`evidence.md`](evidence.md) | Grounding every persona trait (`E` ids) |
-| Interview guide | [Claude Doc](https://claude.ai/artifact/KtSAaqBMXinSnu7dPCyxvW), mirrored in [`protocols/interview.md`](protocols/interview.md) | Questions, hypotheses H1 to H6 |
+| Interview guide | [Claude Doc](https://claude.ai/artifact/KtSAaqBMXinSnu7dPCyxvW), mirrored in [`protocols/interview.md`](protocols/interview.md) | Questions, hypotheses H1 to H10 |
 | Bennett/NSGC standard | [`../../bennett-pedigree-standards.md`](../../bennett-pedigree-standards.md) | Usability answer key |
 | Live app | https://pedigree.clintech.com.au | Usability tests |
 

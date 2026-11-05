@@ -5,7 +5,7 @@
 | Date | 2026-11-05 |
 | Run by | Claude (one agent per persona), for Josh |
 | Evidence register version | 1 |
-| Protocol versions | interview v1 (not yet run), usability v1, synthesis v1 |
+| Protocol versions | interview v2 (not yet run; hypotheses revised to v2 after usability), usability v1, synthesis v1 |
 | Personas and versions | P1–P8, all v1 |
 | Personas reviewed by a human since last round | None yet; sent for genetic-counsellor review ([review doc](https://claude.ai/artifact/QnEGivfHyqQnnoxpaDPTmC)) |
 | Target | Local production build (`vite preview`) of `main` at `e1cb248`. The live site was blocked by the cloud environment's network policy. |

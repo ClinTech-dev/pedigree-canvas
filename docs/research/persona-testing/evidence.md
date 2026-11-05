@@ -1,6 +1,6 @@
 # Evidence register
 
-Version: **1** (2026-11-05). Distilled from the desk research doc
+Version: **2** (2026-11-05; v2 revised the hypotheses). Distilled from the desk research doc
 ["Pedigree Canvas: who draws pedigrees and what limits them"](https://claude.ai/artifact/HcgwAkFxgCB2exrVKmz9jk).
 Persona cards cite these ids. When the desk research changes, add new ids rather
 than renumbering, and bump the version.
@@ -61,11 +61,24 @@ than renumbering, and bump the version.
 | E30 | Public hospital: service lead, then IT, governance and procurement decide; 6 to 18 months; wins on privacy and clinical-safety paperwork, EHR fit, support and a contract. | Desk research, segment table |
 | E31 | About half of counsellors hold a stack of paper pedigrees; photo import would move it in, but a patient photo leaving the device conflicts with local-first. | Desk research, features section |
 
-## Hypotheses (from the desk research)
+## Hypotheses
 
-- **H1** Hand-drawers will switch if Pedigree Canvas is faster than paper in a live consult.
-- **H2** A PDF attached to the record is good enough for most services.
-- **H3** Re-entry into risk calculators is a bigger pain than drawing.
-- **H4** Hospital IT will not block a local-first web app if there is a clear data statement.
-- **H5** Trainees and private clinics are the fastest route to users (word of mouth).
-- **H6** Shared clinic computers make browser autosave a problem.
+Version 2 (2026-11-05), revised with Josh after usability round 1. The interview
+guide and protocols tag questions with these ids.
+
+| Id | Hypothesis | Main segment | Tested by |
+|---|---|---|---|
+| H1 | Speed: Pedigree Canvas is faster than paper for a 3-generation family in a live consult. | All | Timed usability task; Q3, Q4 |
+| H2 | Switch reason: counsellors would switch for something other than raw speed (easy updates, a clean output, showing the patient on a telehealth call). | Private / telehealth, hospital | Q4, Q7, follow-up 1 |
+| H3 | Into the record: a PDF attached to the record is good enough, provided it fits the record's size and format limits. | All | Q6, follow-up 3 |
+| H4 | Re-entry: retyping the family into risk calculators and the EHR hurts more than drawing it. | Cancer counsellors | Q3, Q5 |
+| H5 | Bottom-up route: hospital counsellors are allowed to (or will anyway) draft in an unapproved local-first web tool and attach or import the result, including on shared PCs. IT's own view is tested with one IT or privacy person, not counsellors. | Hospital | Q9–Q11, plus one IT or privacy interview |
+| H6 | Channels: educators are the main channel to trainees; colleagues are the main channel to private counsellors. | Trainees, private | Q12, Q16 |
+| H7 | Willingness to pay: private clinics will pay a small per-seat subscription. | Private / telehealth | Q13 |
+| H8 | Trust: clinicians will file the output as is, without redrawing it. | All | Follow-up 2 |
+| H9 | Updates: updating a family at follow-up hurts more than the first draw. | All | Q8 |
+| H10 | Photo import: people hold a backlog of paper pedigrees and would photograph them to digitise. | Hand-drawers, hospital | Q14, Q15 |
+
+Changes from version 1: old H1 split into H1 and H2; old H2 became H3 with a size
+limit; old H3 became H4; old H4 (IT allows it) and H6 (shared PCs) merged into H5,
+the bottom-up route; old H5 narrowed into H6; H7 to H10 are new.

@@ -55,8 +55,8 @@ reviewed_by_human: no
 
 ## What this persona cannot tell us
 - Which import formats Progeny Clinical accepts in her service's configuration [E28].
-- How her hospital's IT would actually rule on a local-first web app (H4).
-- Whether local storage is wiped at logout on real hospital PCs (H6).
+- How her hospital's IT would actually rule on a local-first web app (H5).
+- Whether local storage is wiped at logout on real hospital PCs (H5).
 
 ## Changelog
 - v1 (2026-11-05): created.

@@ -1,6 +1,6 @@
 # Interview protocol
 
-Version: **1** (2026-11-05). Mirrors the 30-minute interview section of the
+Version: **2** (2026-11-05; v2 adds H7 to H10 and renumbers). Mirrors the 30-minute interview section of the
 [interview guide](https://claude.ai/artifact/KtSAaqBMXinSnu7dPCyxvW). If the guide
 changes, update the questions below and bump the version.
 
@@ -37,7 +37,7 @@ Rules:
 
 Then answer the interview questions below, numbered as in the guide.
 Finally, write:
-- A log row (table below), marking H1 to H6 as Y (supports), N (contradicts)
+- A log row (table below), marking H1 to H10 as Y (supports), N (contradicts)
   or ? (unclear) from this persona's answers, with a one-line reason each.
 - "Questions this persona could not really answer": the UNSURE ones, with why a
   human is needed.
@@ -52,27 +52,37 @@ Finally, write:
 2. Roughly how many pedigrees do you draw in a typical week?
 
 **The last pedigree you drew**
-3. Walk me through the last family history you took, from before the appointment to filing it. (H1, H3)
-4. What did you draw it on: paper, Progeny, something else? Why that? (H1)
-5. Where else did you type that same family? A risk calculator, the record, a letter? How long did that take? (H3)
-6. What happened to the pedigree afterwards? Where does it live now? (H2)
-7. What's the most annoying part of that process?
+3. Walk me through the last family history you took, from before the appointment to filing it. (H1, H4)
+4. What did you draw it on: paper, Progeny, something else? Why that? (H1, H2)
+5. Where else did you type that same family? A risk calculator, the record, a letter? How long did that take? (H4)
+6. What happened to the pedigree afterwards? Where does it live now? Is there a size or format limit on what you can attach? (H3)
+7. What's the most annoying part of that process? (H2)
+
+**Updating**
+8. Think of the last family you saw again at follow-up. How did you update their pedigree, and how long did it take? (H9)
 
 **Tools and IT**
-8. What computer do you draw on? Is it shared? Do you log in as yourself? (H6)
-9. Have you ever tried to get a new tool approved? What were you asked, and how long did it take? (H4)
-10. *Hospital only:* which formats can your system import? If you drafted a pedigree somewhere else and imported it, would anyone object? (bottom-up route)
-11. *Private or trainee only:* who decides what tools you use? Would you pay for one yourself?
+9. What computer do you draw on? Is it shared? Do you log in as yourself? (H5)
+10. Have you ever tried to get a new tool approved? What were you asked, and how long did it take? (H5)
+11. *Hospital only:* which formats can your system import? If you drafted a pedigree somewhere else and attached or imported it, would anyone object? Would you do it anyway? (H5)
+12. *Private or trainee only:* who decides what tools you use? (H6)
+13. *Private only:* what do you pay for software today? What would a pedigree tool have to save you before a monthly fee was worth it? (H7)
 
 **Paper and photos**
-12. Do you keep paper pedigrees? About how many?
-13. Would you photograph one to turn it into a digital pedigree? Would your service allow a photo of patient data to leave the device?
+14. Do you keep paper pedigrees? About how many? (H10)
+15. Would you photograph one to turn it into a digital pedigree? Would your service allow a photo of patient data to leave the device? (H10)
 
 **Wrap-up**
-14. Where did you hear about the tools you use now? Who would you tell about a good one? (H5)
-15. Who else should I talk to?
+16. Where did you hear about the tools you use now? Who would you tell about a good one? *Trainees:* did a lecturer or supervisor point you to it? (H6)
+17. Who else should I talk to?
 
-Skip 10 or 11 when it doesn't apply to the persona's segment, and say so.
+Skip 11, 12 or 13 when it doesn't apply to the persona's segment, and say so.
+
+**Usability follow-ups** (asked after the usability task)
+1. Would you use this in a real consult tomorrow? What would stop you? (H2)
+2. Would you file this pedigree as it is, or redraw it first? What would you change? (H8)
+3. What would you need it to export to? (H3, H4)
+4. What's missing?
 
 ## Output template
 
@@ -88,8 +98,8 @@ Grounding: [E#] [A]
 ...
 
 ## Log row
-| Date | Person | Segment | Current tool | H1 | H2 | H3 | H4 | H5 | H6 | Would photograph paper? | Formats they need | Quote |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Date | Person | Segment | Current tool | H1 | H2 | H3 | H4 | H5 | H6 | H7 | H8 | H9 | H10 | Formats they need | Quote |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | <date> | <P-id> (synthetic) | ... |
 
 ## Hypothesis reasons
