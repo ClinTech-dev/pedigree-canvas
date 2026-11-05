@@ -145,6 +145,40 @@ describe('PropertiesPanel condition handlers', () => {
     expect(usePedigreeStore.getState().document.legendConfig.entries).toHaveLength(0);
   });
 
+  it('defaults a second inline condition to a new quarter and pattern (#174)', () => {
+    seedIndividual({}, [entry]);
+    render(<PropertiesPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: '+ Add Condition' }));
+    const nameInput = screen.getByPlaceholderText('Condition name');
+    // No lookalike warning for the suggested defaults.
+    expect(screen.queryByText(/Looks the same as/)).not.toBeInTheDocument();
+    fireEvent.change(nameInput, { target: { value: 'Ovarian cancer' } });
+    clickAddNear(nameInput);
+
+    const added = usePedigreeStore
+      .getState()
+      .document.legendConfig.entries.find((e) => e.name === 'Ovarian cancer');
+    expect(added).toMatchObject({ quarter: 'topLeft', fillPattern: 'diagonalLines' });
+  });
+
+  it('warns, without blocking, when the inline choice matches an existing condition', () => {
+    seedIndividual({}, [entry]);
+    render(<PropertiesPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: '+ Add Condition' }));
+    const nameInput = screen.getByPlaceholderText('Condition name');
+    // Steer back to the existing entry's exact look: top-right, red, solid.
+    fireEvent.click(screen.getByRole('button', { name: 'Top-Right' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Red' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Solid' }));
+    expect(screen.getByText(/Looks the same as Cancer/)).toBeInTheDocument();
+
+    fireEvent.change(nameInput, { target: { value: 'Lookalike' } });
+    clickAddNear(nameInput);
+    expect(usePedigreeStore.getState().document.legendConfig.entries).toHaveLength(2);
+  });
+
   it('cancels the add-condition form via Escape', () => {
     seedIndividual();
     render(<PropertiesPanel />);

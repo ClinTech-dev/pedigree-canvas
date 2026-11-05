@@ -148,3 +148,34 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Non-blocking warning: two or more entries render identically (issue #174). */
+.lookalikeWarning {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+}
+
+.lookalikeTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 4px;
+}
+
+.lookalikeText {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.lookalikeText + .lookalikeText {
+  margin-top: 4px;
+}
+
+.entryRowLookalike {
+  border-color: var(--color-warning);
+}

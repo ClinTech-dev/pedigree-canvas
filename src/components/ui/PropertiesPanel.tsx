@@ -20,11 +20,10 @@ import {
   freeQuartersFor,
 } from '../../utils/quarterClashes';
 import {
-  COLOR_OPTIONS,
-  PATTERN_OPTIONS,
-  QUARTER_OPTIONS,
-  createConditionEntry,
-} from './legendOptions';
+  entriesIdenticalTo,
+  pickConditionDefaults,
+} from '../../utils/conditionDefaults';
+import { createConditionEntry } from './legendOptions';
 import {
   parentLinksForChild,
   adoptionModeForLink,
@@ -143,20 +142,32 @@ export function PropertiesPanel() {
 
   const [addingCondition, setAddingCondition] = useState(false);
   const [conditionName, setConditionName] = useState('');
-  const [conditionColor, setConditionColor] = useState(COLOR_OPTIONS[0].value);
+  const initialConditionDefaults = pickConditionDefaults([]);
+  const [conditionColor, setConditionColor] = useState(
+    initialConditionDefaults.fillColor,
+  );
   const [conditionQuarter, setConditionQuarter] = useState<QuarterPosition>(
-    QUARTER_OPTIONS[0].value,
+    initialConditionDefaults.quarter,
   );
   const [conditionPattern, setConditionPattern] = useState<FillPatternType>(
-    PATTERN_OPTIONS[0].value,
+    initialConditionDefaults.fillPattern,
   );
 
   const resetConditionForm = useCallback(() => {
     setAddingCondition(false);
     setConditionName('');
-    setConditionColor(COLOR_OPTIONS[0].value);
-    setConditionQuarter(QUARTER_OPTIONS[0].value);
-    setConditionPattern(PATTERN_OPTIONS[0].value);
+  }, []);
+
+  // Open the inline form pre-filled with the next free quarter and an unused
+  // pattern (issue #174). Read the entries imperatively: this is a handler.
+  const openConditionForm = useCallback(() => {
+    const defaults = pickConditionDefaults(
+      usePedigreeStore.getState().document.legendConfig.entries,
+    );
+    setConditionColor(defaults.fillColor);
+    setConditionQuarter(defaults.quarter);
+    setConditionPattern(defaults.fillPattern);
+    setAddingCondition(true);
   }, []);
 
   const submitCondition = useCallback(() => {
@@ -292,6 +303,17 @@ export function PropertiesPanel() {
     appliedConditionIds,
     legendConfig.entries,
   );
+  // Non-blocking: the inline form's choice would render like an existing entry.
+  const conditionLookalikes = addingCondition
+    ? entriesIdenticalTo(
+        {
+          quarter: conditionQuarter,
+          fillColor: conditionColor,
+          fillPattern: conditionPattern,
+        },
+        legendConfig.entries,
+      )
+    : [];
 
   /**
    * Resolve a clash by moving a single condition to a different quarter. This is
@@ -415,6 +437,14 @@ export function PropertiesPanel() {
                 onChange={setConditionPattern}
               />
             </div>
+            {conditionLookalikes.length > 0 && (
+              <p className={styles.lookalikeHint} role="status">
+                Looks the same as{' '}
+                {conditionLookalikes.map((e) => e.name.trim() || 'Unnamed').join(', ')}.
+                Pick another quarter, colour or pattern so they can be told
+                apart.
+              </p>
+            )}
             <div className={styles.noteFormActions}>
               <button
                 className={styles.noteAddButton}
@@ -434,7 +464,7 @@ export function PropertiesPanel() {
         ) : (
           <button
             className={styles.addButton}
-            onClick={() => setAddingCondition(true)}
+            onClick={openConditionForm}
           >
             + Add Condition
           </button>
