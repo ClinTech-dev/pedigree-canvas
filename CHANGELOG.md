@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- Pedigree Canvas now carries the ClinTech family brand: Ward Green and sage
+  neutrals replace Clinical Indigo and the cool greys across the editor, landing
+  page, favicon and share image, Inter replaces the system font, and the About box
+  and landing footer read "A ClinTech product". Bennett/NSGC symbols, condition
+  colours and exports keep their colours. Canvas selection uses a brighter family
+  green (`#2f7d52`), since Ward Green is too close to the ink symbols to stand out.
+- Inter and Caveat are self-hosted, so the app no longer requests fonts from Google.
 - Consanguinity is now independent of relationship status (issue #153). The
   relationship properties panel splits the old three-way Partnership /
   Separated / Consanguineous toggle into a **Status** control (Partnership ·

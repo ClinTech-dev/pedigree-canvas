@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f7f9" />
+    <meta name="theme-color" content="#f9fafa" />
 
     <title>Pedigree Canvas — Clinical pedigree drawing for geneticists and genetic counsellors</title>
     <meta
@@ -43,31 +43,52 @@
         "applicationSubCategory": "Clinical pedigree drawing tool",
         "operatingSystem": "Web browser",
         "description": "Pedigree Canvas is a local-first clinical pedigree drawing tool for geneticists and genetic counsellors. Build standardised family pedigrees with clinical genetics symbols, condition shading, test-result annotations, and export to PDF, PNG, SVG, JSON and .ped.",
+        "publisher": { "@type": "Organization", "name": "ClinTech", "url": "https://clintech.com.au" },
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
       }
     </script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
 
     <style>
+      @font-face {
+        font-family: "Inter";
+        src: url("/fonts/inter-latin-wght-normal.woff2") format("woff2");
+        font-weight: 100 900;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Caveat";
+        src: url("/fonts/caveat-latin-400-normal.woff2") format("woff2");
+        font-weight: 400;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Caveat";
+        src: url("/fonts/caveat-latin-500-normal.woff2") format("woff2");
+        font-weight: 500;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Caveat";
+        src: url("/fonts/caveat-latin-600-normal.woff2") format("woff2");
+        font-weight: 600;
+        font-display: swap;
+      }
+
       :root {
         /* Tokens mirrored verbatim from the app (src/index.css) so the page
            reads as the same instrument, not a separate marketing skin. */
-        --bg: #f7f7f9;
+        --bg: #f9fafa;
         --surface: #ffffff;
-        --border: #e6e6ec;
+        --border: #e2e5e3;
         --ink: #1a1a1a;
-        --ink-2: #6b6b75;
-        --primary: #4f46c9;
-        --primary-hover: #443cb9;
-        --primary-soft: rgba(79, 70, 201, 0.1);
-        --primary-soft-strong: rgba(79, 70, 201, 0.16);
-        --primary-border: rgba(79, 70, 201, 0.28);
+        --ink-2: #515654;
+        --primary: #344c3e;
+        --primary-hover: #2a3e32;
+        --primary-soft: rgba(52, 76, 62, 0.1);
+        --primary-soft-strong: rgba(52, 76, 62, 0.16);
+        --primary-border: rgba(52, 76, 62, 0.28);
         --danger: #dc2626;
         --success: #16a34a;
 
@@ -77,11 +98,11 @@
         --c-blue: #457b9d;
         --c-teal: #2a9d8f;
 
-        --grid: #e2e2e8;
-        --paper: #fbfbfc;
+        --grid: #e2e5e3;
+        --paper: #fbfcfb;
 
-        --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
-          Arial, sans-serif;
+        --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+          Roboto, Helvetica, Arial, sans-serif;
         --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
           monospace;
         --font-hand: "Caveat", cursive;
@@ -90,12 +111,12 @@
         --radius-md: 10px;
         --radius-lg: 14px;
         --radius-pill: 999px; /* landing-only: badges & chips (app uses 50% for circles) */
-        --dot-inert: #d9d9e0; /* decorative window-dots on the canvas mock */
+        --dot-inert: #cfd3d1; /* decorative window-dots on the canvas mock */
 
-        --shadow-island: 0 4px 16px rgba(15, 15, 25, 0.08),
-          0 1px 3px rgba(15, 15, 25, 0.06);
-        --shadow-lift: 0 18px 40px -14px rgba(15, 15, 25, 0.22),
-          0 6px 14px -8px rgba(15, 15, 25, 0.1);
+        --shadow-island: 0 4px 16px rgba(17, 19, 18, 0.08),
+          0 1px 3px rgba(17, 19, 18, 0.06);
+        --shadow-lift: 0 18px 40px -14px rgba(17, 19, 18, 0.22),
+          0 6px 14px -8px rgba(17, 19, 18, 0.1);
 
         /* Semantic z-scale — never arbitrary 9999. */
         --z-canvas: 0;
@@ -206,7 +227,7 @@
         transition: background 0.12s ease, color 0.12s ease;
       }
       .nav__link:hover {
-        background: rgba(0, 0, 0, 0.05);
+        background: rgba(17, 19, 18, 0.05);
         color: var(--ink);
       }
       @media (max-width: 620px) {
@@ -238,17 +259,25 @@
           transform 0.14s var(--ease-out-expo), box-shadow 0.14s ease;
         white-space: nowrap;
       }
+      .footer__meta + .footer__meta {
+        margin-top: 8px;
+      }
+      .footer__maker {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-color: var(--primary-border);
+      }
+      .footer__maker:hover {
+        color: var(--primary);
+        text-decoration-color: currentColor;
+      }
       .btn--primary {
         background: var(--primary);
         color: #fff;
-        box-shadow: 0 1px 2px rgba(79, 70, 201, 0.4),
-          0 8px 20px -8px rgba(79, 70, 201, 0.5);
       }
       .btn--primary:hover {
         background: var(--primary-hover);
         transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(79, 70, 201, 0.4),
-          0 12px 26px -8px rgba(79, 70, 201, 0.55);
       }
       .btn--primary:active {
         transform: translateY(0);
@@ -417,7 +446,7 @@
       }
       .canvas-card__stage {
         position: relative;
-        background-image: radial-gradient(#e9e9ef 1px, transparent 1px);
+        background-image: radial-gradient(#e7eae8 1px, transparent 1px);
         background-size: 20px 20px;
         background-position: -10px -10px;
         padding: 8px;
@@ -584,7 +613,7 @@
         border-radius: var(--radius-md);
         border: 1px solid var(--border);
         background-color: var(--paper);
-        background-image: radial-gradient(#e9e9ef 1px, transparent 1px);
+        background-image: radial-gradient(#e7eae8 1px, transparent 1px);
         background-size: 16px 16px;
         background-position: -8px -8px;
         display: grid;
@@ -904,7 +933,7 @@
       <div class="wrap nav__inner">
         <a class="brand" href="#top" aria-label="Pedigree Canvas home">
           <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
-            <rect width="32" height="32" rx="6" fill="#1a1a1a" />
+            <rect width="32" height="32" rx="6" fill="#344c3e" />
             <line x1="11" y1="16" x2="21" y2="16" stroke="#fff" stroke-width="1.6" />
             <rect x="5.5" y="11.5" width="9" height="9" fill="#fff" />
             <circle cx="22" cy="16" r="4.5" fill="none" stroke="#fff" stroke-width="1.8" />
@@ -992,9 +1021,9 @@
               </defs>
 
               <!-- Generation numerals -->
-              <text class="mark" style="--d:0.1s" x="26" y="96" font-family="var(--font-mono)" font-size="15" fill="#9a9aa4" font-style="italic">I</text>
-              <text class="mark" style="--d:0.7s" x="24" y="226" font-family="var(--font-mono)" font-size="15" fill="#9a9aa4" font-style="italic">II</text>
-              <text class="mark" style="--d:1.3s" x="22" y="356" font-family="var(--font-mono)" font-size="15" fill="#9a9aa4" font-style="italic">III</text>
+              <text class="mark" style="--d:0.1s" x="26" y="96" font-family="var(--font-mono)" font-size="15" fill="#6f7572" font-style="italic">I</text>
+              <text class="mark" style="--d:0.7s" x="24" y="226" font-family="var(--font-mono)" font-size="15" fill="#6f7572" font-style="italic">II</text>
+              <text class="mark" style="--d:1.3s" x="22" y="356" font-family="var(--font-mono)" font-size="15" fill="#6f7572" font-style="italic">III</text>
 
               <!-- ===== Relationship lines (drawn first, behind symbols) ===== -->
               <!-- Gen I partnership -->
@@ -1037,13 +1066,13 @@
 
               <!-- Hand annotation, Caveat -->
               <g class="scrawl">
-                <path d="M405 196 q28 4 44 26" fill="none" stroke="#4f46c9" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M446 214 l3 8 l7 -4" fill="none" stroke="#4f46c9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                <text x="404" y="244" font-family="var(--font-hand)" font-size="23" fill="#4f46c9">proband — index case</text>
+                <path d="M405 196 q28 4 44 26" fill="none" stroke="#344c3e" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M446 214 l3 8 l7 -4" fill="none" stroke="#344c3e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <text x="404" y="244" font-family="var(--font-hand)" font-size="23" fill="#344c3e">proband — index case</text>
               </g>
               <g class="scrawl">
-                <text x="392" y="326" font-family="var(--font-hand)" font-size="22" fill="#4f46c9">MZ twins</text>
-                <path d="M388 320 q-14 2 -22 -6" fill="none" stroke="#4f46c9" stroke-width="1.6" stroke-linecap="round"/>
+                <text x="392" y="326" font-family="var(--font-hand)" font-size="22" fill="#344c3e">MZ twins</text>
+                <path d="M388 320 q-14 2 -22 -6" fill="none" stroke="#344c3e" stroke-width="1.6" stroke-linecap="round"/>
               </g>
             </svg>
 
@@ -1082,19 +1111,19 @@
             <span class="contrast__label">By hand · a generic canvas</span>
             <ul class="contrast__list">
               <li>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9aa4" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9f9c" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 Symbols and lines drawn freehand, inconsistent between clinicians.
               </li>
               <li>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9aa4" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9f9c" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 No idea what a proband arrow, quarter-fill or MZ twin bar means.
               </li>
               <li>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9aa4" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9f9c" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 <span>No <code style="font-family:var(--font-mono);font-size:12px">.ped</code> export for downstream tools.</span>
               </li>
               <li>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9aa4" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a9f9c" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 Redraw the whole family every time someone is added.
               </li>
             </ul>
@@ -1103,19 +1132,19 @@
             <span class="contrast__label">Pedigree Canvas</span>
             <ul class="contrast__list">
               <li>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46c9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#344c3e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 Every symbol, fill and line follows Bennett/NSGC nomenclature.
               </li>
               <li>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46c9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#344c3e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 Partnerships, consanguinity, twins and adoption are first-class.
               </li>
               <li>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46c9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#344c3e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 <span>One click to PDF, PNG, SVG, JSON or <code style="font-family:var(--font-mono);font-size:12px">.ped</code>.</span>
               </li>
               <li>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46c9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#344c3e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 Auto-layout keeps generations aligned as the family grows.
               </li>
             </ul>
@@ -1291,7 +1320,7 @@
                 <rect x="16" y="13" width="40" height="40" fill="none" stroke="#1a1a1a" stroke-width="2.2"/>
                 <line x1="36" y1="13" x2="36" y2="53" stroke="#1a1a1a" stroke-width="1"/>
                 <line x1="16" y1="33" x2="56" y2="33" stroke="#1a1a1a" stroke-width="1"/>
-                <rect x="84" y="19" width="100" height="27" rx="6" fill="#ffffff" stroke="#e6e6ec" stroke-width="1.5"/>
+                <rect x="84" y="19" width="100" height="27" rx="6" fill="#ffffff" stroke="#e2e5e3" stroke-width="1.5"/>
                 <text x="96" y="37" font-family="ui-monospace, Menlo, monospace" font-size="14" fill="#1a1a1a">BRCA1</text>
                 <text x="150" y="37" font-family="ui-monospace, Menlo, monospace" font-size="15" font-weight="700" fill="#16a34a">+</text>
               </svg>
@@ -1308,12 +1337,12 @@
           <article class="feature">
             <div class="feature__viz">
               <svg viewBox="0 0 220 84" aria-hidden="true">
-                <rect x="16" y="14" width="188" height="34" rx="8" fill="#ffffff" stroke="#e6e6ec" stroke-width="1.5"/>
-                <line x1="34" y1="24" x2="34" y2="38" stroke="#4f46c9" stroke-width="2" stroke-linecap="round"/>
-                <text x="44" y="36" font-family="system-ui, sans-serif" font-size="13" fill="#6b6b75">Add individual</text>
-                <rect x="162" y="22" width="32" height="18" rx="4" fill="#4f46c91a" stroke="#4f46c947" stroke-width="1"/>
-                <text x="169" y="35" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#4f46c9">⌘K</text>
-                <rect x="16" y="56" width="188" height="16" rx="4" fill="#4f46c91a"/>
+                <rect x="16" y="14" width="188" height="34" rx="8" fill="#ffffff" stroke="#e2e5e3" stroke-width="1.5"/>
+                <line x1="34" y1="24" x2="34" y2="38" stroke="#344c3e" stroke-width="2" stroke-linecap="round"/>
+                <text x="44" y="36" font-family="var(--font-sans)" font-size="13" fill="#515654">Add individual</text>
+                <rect x="162" y="22" width="32" height="18" rx="4" fill="#344c3e1a" stroke="#344c3e47" stroke-width="1"/>
+                <text x="169" y="35" font-family="var(--font-sans)" font-size="11" font-weight="700" fill="#344c3e">⌘K</text>
+                <rect x="16" y="56" width="188" height="16" rx="4" fill="#344c3e1a"/>
               </svg>
             </div>
             <h3>Fast under pressure</h3>
@@ -1404,7 +1433,7 @@
         <div>
           <a class="brand" href="#top" style="margin-bottom:12px">
             <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
-              <rect width="32" height="32" rx="6" fill="#1a1a1a" />
+              <rect width="32" height="32" rx="6" fill="#344c3e" />
               <line x1="11" y1="16" x2="21" y2="16" stroke="#fff" stroke-width="1.6" />
               <rect x="5.5" y="11.5" width="9" height="9" fill="#fff" />
               <circle cx="22" cy="16" r="4.5" fill="none" stroke="#fff" stroke-width="1.8" />
@@ -1414,6 +1443,9 @@
           <p class="footer__meta">
             Clinical pedigree drawing for geneticists and genetic counsellors.
             Built to the Bennett / NSGC standard. Runs in your browser.
+          </p>
+          <p class="footer__meta">
+            A <a class="footer__maker" href="https://clintech.com.au" target="_blank" rel="noopener">ClinTech</a> product, made in Perth.
           </p>
         </div>
         <nav class="footer__links" aria-label="Footer">

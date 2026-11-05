@@ -15,12 +15,12 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(17, 19, 18, 0.08), 0 1px 3px rgba(17, 19, 18, 0.06);
   opacity: 0.75;
   transition: opacity 0.12s, background-color 0.12s;
 }
 
 .exitButton:hover {
   opacity: 1;
-  background: var(--color-surface-hover, rgba(0, 0, 0, 0.04));
+  background: var(--color-surface-hover, rgba(17, 19, 18, 0.04));
 }

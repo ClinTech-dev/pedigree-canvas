@@ -1,6 +1,7 @@
 import React from 'react';
 import { Line } from 'react-konva';
 import type { Individual } from '../../types/pedigree';
+import { LINK_SOURCE_COLOR } from '../../utils/constants';
 
 interface DragLinkLayerProps {
   active: boolean;
@@ -19,7 +20,7 @@ export const DragLinkLayer: React.FC<DragLinkLayerProps> = React.memo(
     return (
       <Line
         points={[source.position.x, source.position.y, cursorPos.x, cursorPos.y]}
-        stroke="#2563eb"
+        stroke={LINK_SOURCE_COLOR}
         strokeWidth={2}
         dash={[8, 4]}
         listening={false}

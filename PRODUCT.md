@@ -49,9 +49,11 @@ never shouts.
 - **Emotional goal:** trust and low friction. The user should feel the tool is
   competent and on their side — approachable enough that a first-timer isn't
   intimidated, rigorous enough that a senior clinician trusts the output.
-- **Heritage:** it descends from Excalidraw (floating islands, violet accent, a
-  hint of hand-drawn warmth via the Caveat annotation font). Keep the warmth and
-  the get-out-of-the-way ergonomics; drop the whiteboard casualness where clinical
+- **Family:** a ClinTech product and a sibling of Issued. It shares Ward Green, the
+  sage neutrals and Inter, and is presented as "A ClinTech product."
+- **Heritage:** its working habits descend from Excalidraw (floating islands, a hint
+  of hand-drawn warmth via Caveat in first-run hints). Keep the warmth and the
+  get-out-of-the-way ergonomics; drop the whiteboard casualness where clinical
   seriousness is required.
 
 ## Anti-references

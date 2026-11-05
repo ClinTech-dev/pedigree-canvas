@@ -1,6 +1,8 @@
 # Pedigree Canvas
 
 > Clinical pedigree drawing for geneticists and genetic counsellors.
+>
+> A [ClinTech](https://clintech.com.au) product.
 
 [![CI](https://github.com/Jdjellis/pedigree-canvas/actions/workflows/ci.yml/badge.svg)](https://github.com/Jdjellis/pedigree-canvas/actions/workflows/ci.yml)
 

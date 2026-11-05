@@ -17,17 +17,17 @@
   gap: 4px;
   min-width: 160px;
   padding: 8px;
-  background: #ffffff;
-  border: 1px solid #d4d4d8;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 4px 16px rgba(17, 19, 18, 0.18);
 }
 
 .title {
   margin: 0 2px 2px;
   font-size: 11px;
   font-weight: 600;
-  color: #71717a;
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -38,8 +38,8 @@
   align-items: flex-start;
   gap: 1px;
   padding: 6px 10px;
-  background: #fafafa;
-  border: 1px solid #e4e4e7;
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   font: inherit;
   text-align: left;
@@ -54,10 +54,10 @@
 .optionLabel {
   font-size: 13px;
   font-weight: 500;
-  color: #18181b;
+  color: var(--color-text);
 }
 
 .optionHint {
   font-size: 11px;
-  color: #71717a;
+  color: var(--color-text-secondary);
 }

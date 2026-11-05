@@ -34,6 +34,7 @@ import {
   ZOOM_WHEEL_SENSITIVITY,
   WHEEL_LINE_HEIGHT,
   SYMBOL_SIZE,
+  SELECTION_COLOR,
 } from '../../utils/constants';
 import {
   marqueeRect,
@@ -668,8 +669,8 @@ export const CanvasContainer = forwardRef<CanvasContainerHandle>(
               {marquee && (
                 <Rect
                   {...marqueeRect(marquee.start, marquee.current)}
-                  fill="rgba(79, 70, 201, 0.12)"
-                  stroke="#4f46c9"
+                  fill="rgba(47, 125, 82, 0.12)"
+                  stroke={SELECTION_COLOR}
                   strokeWidth={1}
                 />
               )}

@@ -18,10 +18,10 @@
   font-family: inherit;
   font-size: 12px;
   padding: 1px 6px;
-  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.18));
+  border: 1px solid var(--color-border, rgba(17, 19, 18, 0.18));
   border-radius: 4px;
   background: var(--color-surface, #ffffff);
   color: var(--color-text);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 0 rgba(17, 19, 18, 0.05);
   white-space: nowrap;
 }

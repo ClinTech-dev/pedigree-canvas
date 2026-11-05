@@ -133,7 +133,11 @@ export function HelpOverlay(): React.JSX.Element {
 
             <footer className={styles.footer}>
               <span className={styles.version}>Pedigree Canvas v{__APP_VERSION__}</span>
-              {' — '}your data stays on your device.
+              {' — '}your data stays on your device. A{' '}
+              <a className={styles.feedbackLink} href="https://clintech.com.au" target="_blank" rel="noopener">
+                ClinTech
+              </a>{' '}
+              product.
             </footer>
           </div>
         </Dialog.Content>

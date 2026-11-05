@@ -13,10 +13,10 @@
   z-index: 100;
   transform: translate(-50%, -100%);
   padding: 6px;
-  background: #ffffff;
-  border: 1px solid #d4d4d8;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 4px 16px rgba(17, 19, 18, 0.18);
 }
 
 /* Single row: gender icons, then (when enabled) a divider and the twin icons as
@@ -31,5 +31,5 @@
   width: 1px;
   align-self: stretch;
   margin: 2px 0;
-  background: #ececf0;
+  background: var(--color-surface-hover);
 }

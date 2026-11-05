@@ -1,3 +1,28 @@
+/* Self-hosted: the app makes no third-party font requests. */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caveat';
+  src: url('/fonts/caveat-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caveat';
+  src: url('/fonts/caveat-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
@@ -7,24 +32,30 @@
 }
 
 :root {
-  --color-bg: #f7f7f9;
+  /* The ClinTech family neutrals (sage) shared with Issued. */
+  --color-bg: #f9fafa;
   --color-surface: #ffffff;
-  --color-border: #e6e6ec;
-  --color-text: #1a1a1a;
-  --color-text-secondary: #6b6b75;
-  /* Clinical Indigo — the chosen primary accent (selection, primary action,
-     active state). Deliberately deeper than the inherited Excalidraw violet. */
-  --color-primary: #4f46c9;
-  --color-primary-hover: #443cb9;
-  --color-primary-soft: rgba(79, 70, 201, 0.1);
-  --color-primary-soft-strong: rgba(79, 70, 201, 0.16);
-  --color-primary-border: rgba(79, 70, 201, 0.28);
+  --color-surface-hover: #f1f3f2;
+  --color-border: #e2e5e3;
+  --color-border-strong: #cfd3d1;
+  --color-text: #1b1d1c;
+  --color-text-secondary: #515654;
+  /* Ward Green: primary action, active state and focus in the chrome. Canvas
+     selection uses SELECTION_COLOR instead (see utils/constants.ts). */
+  --color-primary: #344c3e;
+  --color-primary-hover: #2a3e32;
+  --color-primary-soft: rgba(52, 76, 62, 0.1);
+  --color-primary-soft-strong: rgba(52, 76, 62, 0.16);
+  --color-primary-border: rgba(52, 76, 62, 0.28);
   --color-danger: #dc2626;
   --color-warning: #d97706;
   --color-success: #16a34a;
+  --color-scrim: rgba(17, 19, 18, 0.4);
+  --color-track: rgba(62, 66, 64, 0.08);
+  --color-track-hover: rgba(62, 66, 64, 0.12);
 
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
-    sans-serif;
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
     'Liberation Mono', monospace;
 
@@ -32,11 +63,11 @@
   --radius-md: 10px;
   --radius-lg: 14px;
 
-  --shadow-sm: 0 1px 2px rgba(15, 15, 25, 0.06);
-  --shadow-md: 0 4px 12px -2px rgba(15, 15, 25, 0.1),
-    0 2px 4px -2px rgba(15, 15, 25, 0.06);
-  --shadow-lg: 0 12px 28px -6px rgba(15, 15, 25, 0.16),
-    0 4px 10px -4px rgba(15, 15, 25, 0.08);
+  --shadow-sm: 0 1px 2px rgba(17, 19, 18, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(17, 19, 18, 0.1),
+    0 2px 4px -2px rgba(17, 19, 18, 0.06);
+  --shadow-lg: 0 12px 28px -6px rgba(17, 19, 18, 0.16),
+    0 4px 10px -4px rgba(17, 19, 18, 0.08);
 }
 
 /*
@@ -55,12 +86,14 @@
 [data-theme='warm'] {
   --color-bg: #fff8e1;
   --color-surface: #fffdf6;
+  --color-surface-hover: #f8f1da;
   --color-border: #ede5c8;
+  --color-border-strong: #ddd0a8;
   --color-text: #3a3326;
   --color-text-secondary: #756a50;
-  --color-primary-soft: rgba(79, 70, 201, 0.12);
-  --color-primary-soft-strong: rgba(79, 70, 201, 0.18);
-  --color-primary-border: rgba(79, 70, 201, 0.32);
+  --color-primary-soft: rgba(52, 76, 62, 0.12);
+  --color-primary-soft-strong: rgba(52, 76, 62, 0.18);
+  --color-primary-border: rgba(52, 76, 62, 0.32);
 
   --shadow-sm: 0 1px 2px rgba(60, 45, 20, 0.08);
   --shadow-md: 0 4px 12px -2px rgba(60, 45, 20, 0.12),
@@ -80,7 +113,9 @@
 [data-theme='dim'] {
   --color-bg: #d6d3cd;
   --color-surface: #e2e0db;
+  --color-surface-hover: #d6d3cd;
   --color-border: #c3c0b9;
+  --color-border-strong: #b1aea6;
   --color-text: #2d2b27;
   --color-text-secondary: #5d594f;
 
@@ -102,6 +137,18 @@ body,
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  caret-color: var(--color-primary);
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 button {

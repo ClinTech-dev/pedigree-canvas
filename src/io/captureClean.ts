@@ -1,5 +1,5 @@
 import type Konva from 'konva';
-import { SYMBOL_COLOR } from '../utils/constants';
+import { SELECTION_COLOR, SYMBOL_COLOR } from '../utils/constants';
 
 /**
  * Konva node name applied to "chrome" nodes that must NOT appear in exports:
@@ -10,13 +10,13 @@ import { SYMBOL_COLOR } from '../utils/constants';
 export const EXPORT_EXCLUDE_NAME = 'export-exclude';
 
 /**
- * Stroke colour applied to a symbol's outline while it is selected. Must match
- * `SELECTION_COLOR` in `PedigreeSymbol.tsx`. A selected symbol's outline (not a
+ * Stroke colour applied to a symbol's outline while it is selected. It is
+ * `SELECTION_COLOR`, as drawn by `PedigreeSymbol.tsx`. A selected symbol's outline (not a
  * separate halo node, so it cannot be hidden via {@link EXPORT_EXCLUDE_NAME}) is
  * temporarily recoloured to {@link SYMBOL_COLOR} during a clean capture so the
  * exported document never shows the editing selection colour.
  */
-const SELECTION_STROKE_COLOR = '#4f46c9';
+const SELECTION_STROKE_COLOR = SELECTION_COLOR;
 
 /** Padding (in content-space px) added around the pedigree content in exports. */
 const EXPORT_PADDING = 40;

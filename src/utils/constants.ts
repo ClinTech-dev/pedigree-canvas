@@ -27,8 +27,14 @@ export const MIN_GENERATION_NODE_SPACING = SYMBOL_SIZE * 2;
 // Connection lines
 export const LINE_COLOR = '#1a1a1a';
 export const LINE_WIDTH = 2;
-/** Accent colour for selected symbols and connections. */
-export const SELECTION_COLOR = '#4f46c9';
+/**
+ * Accent colour for selected symbols and connections. Ward Green itself is only
+ * 1.86:1 against the ink symbols, so selection would be invisible; this brighter
+ * family green holds >=3:1 against ink and every comfort theme's paper.
+ */
+export const SELECTION_COLOR = '#2f7d52';
+/** Source ring and dashed preview line of an in-progress connect gesture. */
+export const LINK_SOURCE_COLOR = '#344c3e';
 export const CONSANGUINITY_GAP = 4;
 export const DASH_PATTERN = [8, 4];
 
