@@ -193,6 +193,58 @@
 }
 
 /*
+ * Instant hover/focus label for the four cardinal buttons (#178): the 8px
+ * caption alone was misread (Partner taken for Sibling), so a plain-language
+ * chip ("Add partner (spouse / mate)") appears outward from the symbol, in the
+ * same dark-chip style as the privacy badge's tooltip. Only the cardinals carry
+ * `data-tip`; positions/geometry of the buttons themselves are unchanged.
+ */
+.option[data-tip]::after {
+  /* Empty alt text keeps the chip out of the accessible name (which stays
+     the visible caption); the text is exposed via aria-description instead.
+     The first declaration is the fallback for engines without alt syntax. */
+  content: attr(data-tip);
+  content: attr(data-tip) / '';
+  position: absolute;
+  white-space: nowrap;
+  background: var(--color-text);
+  color: var(--color-surface);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+  padding: 3px 8px;
+  border-radius: 5px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+}
+.option[data-tip]:hover::after,
+.option[data-tip]:focus-visible::after {
+  opacity: 1;
+}
+.top[data-tip]::after {
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.right[data-tip]::after {
+  left: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+.bottom[data-tip]::after {
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.left[data-tip]::after {
+  right: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/*
  * Persistent ⌥ discovery badge on the Sibling & Child buttons: a tiny glyph
  * clipped to the top-right corner, a standing reminder that a modifier unlocks
  * more options. Aria-hidden decoration; the button `title` stays the a11y hint.

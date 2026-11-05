@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { usePedigreeStore } from '../../../stores/pedigreeStore';
 import { useUIStore } from '../../../stores/uiStore';
@@ -199,10 +199,13 @@ test('menu items expose their keyboard shortcut without polluting the accessible
   // Accessible name stays the bare label (name-anchored queries still match)…
   const openItem = screen.getByRole('menuitem', { name: /^open$/i });
   // …while the shortcut is surfaced via aria-keyshortcuts for assistive tech.
-  expect(openItem).toHaveAttribute('aria-keyshortcuts', '⌘O');
+  // jsdom reports a non-Mac platform, so ⌘ maps to Control (#178).
+  expect(openItem).toHaveAttribute('aria-keyshortcuts', 'Control+O');
 
   const exportItem = screen.getByRole('menuitem', { name: /^export$/i });
-  expect(exportItem).toHaveAttribute('aria-keyshortcuts', '⌘E');
+  expect(exportItem).toHaveAttribute('aria-keyshortcuts', 'Control+E');
+  // …and the visible badge shows Ctrl, not ⌘, off a Mac.
+  expect(within(exportItem).getByText('Ctrl+E')).toBeInTheDocument();
 });
 
 test('menu closes after clicking the "Command palette" item', () => {

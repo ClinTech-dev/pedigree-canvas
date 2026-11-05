@@ -41,9 +41,11 @@ describe('OnboardingHints with 0 individuals', () => {
     expect(screen.getByRole('button', { name: 'Help' })).toBeInTheDocument();
   });
 
-  test('renders the ⌘K shortcut hint', () => {
+  test('renders the command-palette shortcut hint for the platform', () => {
     render(<OnboardingHints />);
-    expect(screen.getByText('⌘K')).toBeInTheDocument();
+    // jsdom is a non-Mac platform → Ctrl+K, never ⌘K (#178).
+    expect(screen.getByText('Ctrl+K')).toBeInTheDocument();
+    expect(screen.queryByText('⌘K')).toBeNull();
   });
 });
 

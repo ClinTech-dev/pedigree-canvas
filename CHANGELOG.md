@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- Persona round 1 polish (issue #178). **Fit** now includes the on-canvas legend
+  and keeps content clear of the toolbar and other islands; parents added above
+  the top generation are panned into view instead of landing under the toolbar.
+  Shortcut hints show `Ctrl` / `Alt` on Windows and Linux (⌘ / ⌥ stay on Mac).
+  The radial menu's Parent / Partner / Child / Sibling buttons show an instant
+  plain-language label on hover. **New** opens a dialog that says the current
+  pedigree is only kept in this browser and offers to export it first. The
+  Import/Export dialog no longer shows a stale status from an earlier export.
 - The repository moved to `ClinTech-dev/pedigree-canvas`; links now point there.
 - Pedigree Canvas now carries the ClinTech family brand: Ward Green and sage
   neutrals replace Clinical Indigo and the cool greys across the editor, landing

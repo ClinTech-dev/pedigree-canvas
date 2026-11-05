@@ -1,5 +1,6 @@
 import { useUIStore } from '../../../stores/uiStore';
 import styles from './ToolHint.module.css';
+import { formatShortcut } from '../../../utils/platformShortcut';
 
 /**
  * Per-tool hint shown under the toolbar. Contextual: the select tool swaps
@@ -24,7 +25,7 @@ export function ToolHint(): React.JSX.Element | null {
     if (hoveredId) {
       hint = (
         <>
-          Hold <kbd>Alt</kbd> and drag onto another person to link them
+          Hold <kbd>{formatShortcut('⌥')}</kbd> and drag onto another person to link them
         </>
       );
     } else {

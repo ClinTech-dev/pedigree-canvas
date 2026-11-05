@@ -1,6 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { useUIStore } from '../../stores/uiStore';
 import styles from './ShortcutsOverlay.module.css';
+import { formatShortcut } from '../../utils/platformShortcut';
 
 // ---------------------------------------------------------------------------
 // Static data — mirrors the bindings in useKeyboardShortcuts.ts.
@@ -45,7 +46,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     rows: [
       {
         description: 'Link two people (then pick the relationship type)',
-        keys: ['Alt + Drag'],
+        keys: ['⌥ + Drag'],
       },
       {
         description: 'Edit a line (relationship type, consanguinity, infertility)',
@@ -151,7 +152,7 @@ export function ShortcutsOverlay(): React.JSX.Element {
                     <span className={styles.keys}>
                       {row.keys.map((key) => (
                         <kbd key={key} className={styles.kbd}>
-                          {key}
+                          {formatShortcut(key)}
                         </kbd>
                       ))}
                     </span>

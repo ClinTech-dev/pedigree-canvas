@@ -1,6 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { useUIStore } from '../../stores/uiStore';
 import styles from './HelpOverlay.module.css';
+import { formatShortcut } from '../../utils/platformShortcut';
 
 /** Feedback destination — opens the tester's own mail client. */
 const FEEDBACK_HREF = 'mailto:josh.ellis@clintech.dev?subject=Pedigree%20Canvas%20feedback';
@@ -75,7 +76,7 @@ export function HelpOverlay(): React.JSX.Element {
                 <li>Hover near a person to add relatives.</li>
                 <li>Use ▢ ● ◇ to set a person&apos;s sex.</li>
                 <li>
-                  Hold <kbd className={styles.kbd}>Alt</kbd> and drag from one
+                  Hold <kbd className={styles.kbd}>{formatShortcut('⌥')}</kbd> and drag from one
                   person to another to link them, then pick the relationship type.
                 </li>
                 <li>
@@ -83,7 +84,7 @@ export function HelpOverlay(): React.JSX.Element {
                   panel — line type, consanguinity, and infertility live there.
                 </li>
                 <li>
-                  Press <kbd className={styles.kbd}>⌘K</kbd> for all commands.
+                  Press <kbd className={styles.kbd}>{formatShortcut('⌘K')}</kbd> for all commands.
                 </li>
                 <li>Open, import, and export from the top-left menu.</li>
               </ol>

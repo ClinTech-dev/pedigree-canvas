@@ -2,6 +2,7 @@ import { useEditorActions } from '../../../commands/useEditorActions';
 import { useUIStore } from '../../../stores/uiStore';
 import { Island } from './Island';
 import styles from './islands.module.css';
+import { formatShortcut } from '../../../utils/platformShortcut';
 
 /**
  * Floating history island containing Undo and Redo controls.
@@ -31,7 +32,7 @@ export function HistoryIsland(): React.JSX.Element | null {
         type="button"
         className={styles.button}
         onClick={undo}
-        title="Undo (Cmd+Z)"
+        title={`Undo (${formatShortcut('⌘Z')})`}
         aria-label="Undo"
       >
         &#x21A9;
@@ -41,7 +42,7 @@ export function HistoryIsland(): React.JSX.Element | null {
         type="button"
         className={styles.button}
         onClick={redo}
-        title="Redo (Cmd+Shift+Z)"
+        title={`Redo (${formatShortcut('⌘⇧Z')})`}
         aria-label="Redo"
       >
         &#x21AA;

@@ -26,7 +26,7 @@ test.describe('build a pedigree', () => {
 
     // Open the radial add-menu on the founder and add a partner.
     await openRadialOnSeed(page);
-    await page.getByTitle('Add Partner').click();
+    await page.getByRole('button', { name: 'Partner', exact: true }).click();
 
     // Adding a partner selects the new person and re-opens the gender picker on
     // them — set their sex to complete the couple.

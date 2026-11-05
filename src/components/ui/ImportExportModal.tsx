@@ -22,6 +22,17 @@ export function ImportExportModal({ getStage }: ImportExportModalProps) {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // The modal stays mounted between openings, so a status from an earlier
+  // export ("PDF exported.") would otherwise reappear in the next dialog —
+  // including the Import one (#178). Reset messages whenever the active modal
+  // changes (state adjusted during render, React's recommended pattern).
+  const [messagesFor, setMessagesFor] = useState(activeModal);
+  if (messagesFor !== activeModal) {
+    setMessagesFor(activeModal);
+    setStatus(null);
+    setError(null);
+  }
+
   const clearMessages = useCallback(() => {
     setStatus(null);
     setError(null);
@@ -147,7 +158,7 @@ export function ImportExportModal({ getStage }: ImportExportModalProps) {
           <h2 className={styles.title}>
             {isExport ? 'Export Pedigree' : 'Import Pedigree'}
           </h2>
-          <button className={styles.closeButton} onClick={handleClose}>
+          <button className={styles.closeButton} onClick={handleClose} aria-label="Close">
             &times;
           </button>
         </div>

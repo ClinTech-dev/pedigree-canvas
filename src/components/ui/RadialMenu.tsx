@@ -13,6 +13,8 @@ import { PARTNER_SPACING, GENERATION_SPACING, SIBLING_SPACING } from '../../util
 import type { PartnershipRelationship, ParentChildRelationship } from '../../types/pedigree';
 import styles from './RadialMenu.module.css';
 import clsx from 'clsx';
+import { formatShortcut } from '../../utils/platformShortcut';
+import { revealIndividuals } from '../../utils/viewportChrome';
 
 /**
  * A tiny persistent ⌥ badge shown on the Sibling and Child buttons, advertising
@@ -24,9 +26,28 @@ import clsx from 'clsx';
 function TwinBadge() {
   return (
     <span className={styles.altBadge} aria-hidden="true">
-      ⌥
+      {formatShortcut('⌥')}
     </span>
   );
+}
+
+/**
+ * Hover label for a cardinal radial button (#178). The visible 8px caption
+ * ("Partner") was too easy to misread — a mouse-only tester took the button
+ * beside a person for Sibling — so hovering or focusing a button now shows an
+ * instant, plain-language chip ("Add partner (spouse / mate)") via CSS
+ * (`data-tip`, no native-title delay). The accessible name stays the visible
+ * caption; the chip text (plus any secondary hint) is exposed as the
+ * accessible description.
+ */
+function radialTip(tip: string, hint?: string): {
+  'data-tip': string;
+  'aria-description': string;
+} {
+  return {
+    'data-tip': tip,
+    'aria-description': hint ? `${tip}. ${hint}` : tip,
+  };
 }
 
 export function RadialMenu() {
@@ -173,6 +194,7 @@ export function RadialMenu() {
       addParentsToParentlessUnion(parent1, parent2, union.id);
       hideRadialMenu();
       select(parent1.id);
+      revealIndividuals([parent1.id, parent2.id]);
       return;
     }
 
@@ -188,6 +210,7 @@ export function RadialMenu() {
       fillUnionPartner(secondParent, union.id);
       hideRadialMenu();
       select(secondParent.id);
+      revealIndividuals([secondParent.id]);
       return;
     }
 
@@ -220,6 +243,7 @@ export function RadialMenu() {
       addParentSet(secondParent1, secondParent2, secondPartnership, secondLink);
       hideRadialMenu();
       select(secondParent1.id);
+      revealIndividuals([secondParent1.id, secondParent2.id]);
       return;
     }
 
@@ -243,6 +267,9 @@ export function RadialMenu() {
     addParentsForChild(parent1, parent2, partnership, link, target.id, childGeneration);
     hideRadialMenu();
     select(parent1.id);
+    // New parents sit a generation above the target — above the top row they
+    // can land under the toolbar, so pan just enough to keep them visible (#178).
+    revealIndividuals([parent1.id, parent2.id]);
   }, [target, targetId, doc, addParentsForChild, addParentSet, addParentsToParentlessUnion, fillUnionPartner, hideRadialMenu, select]);
 
   const handleAddPartner = useCallback(() => {
@@ -451,14 +478,14 @@ export function RadialMenu() {
         <button
           className={clsx(styles.option, styles.top, !canAddParents && styles.disabled)}
           onClick={canAddParents ? handleAddParent : undefined}
-          title={addsSecondParentSet ? 'Add another parent set (e.g. adoptive)' : 'Add Parents'}
+          {...radialTip(addsSecondParentSet ? 'Add another parent set (e.g. adoptive)' : 'Add parents')}
         >
           Parent
         </button>
         <button
           className={clsx(styles.option, styles.right)}
           onClick={handleAddPartner}
-          title="Add Partner"
+          {...radialTip('Add partner (spouse / mate)')}
         >
           Partner
         </button>
@@ -467,7 +494,7 @@ export function RadialMenu() {
           onClick={handleAddChild}
           onMouseEnter={() => armGhost('child')}
           onMouseLeave={disarmGhost}
-          title="Add Child (hold ⌥ or dwell for MZ / DZ twin children)"
+          {...radialTip('Add child', `Hold ${formatShortcut('⌥')} or wait for MZ / DZ twin children`)}
         >
           Child
           {featureFlags.altHint && <TwinBadge />}
@@ -495,7 +522,7 @@ export function RadialMenu() {
           onClick={handleAddSibling}
           onMouseEnter={() => armGhost('sibling')}
           onMouseLeave={disarmGhost}
-          title="Add Sibling (hold ⌥ or dwell for MZ / DZ twin)"
+          {...radialTip('Add sibling', `Hold ${formatShortcut('⌥')} or wait for MZ / DZ twin`)}
         >
           Sibling
           {featureFlags.altHint && <TwinBadge />}
