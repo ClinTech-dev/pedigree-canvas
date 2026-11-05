@@ -206,11 +206,11 @@ cross-checks the two agree on **every** fixture so they cannot drift, and
   the hub's other unions tidy and `noNodeBetweenPartners` permits the co-spouse
   between by construction, but the stranded spouse still trips `minPartnerSpacing`
   (its aesthetic spacing widens). Fixing it properly needs line-routing or hub
-  duplication — tracked in [issue #141](https://github.com/Jdjellis/pedigree-canvas/issues/141).
+  duplication — tracked in [issue #141](https://github.com/ClinTech-dev/pedigree-canvas/issues/141).
 - **A married twin** is excluded from `reformatLayout`'s `makeTwinsContiguous`
   post-pass (which pulls single-node chains only), so a non-twin sibling can
   tie-break between a coupled twin and its co-twin, violating `twinContiguity`.
-  Also tracked in [issue #141](https://github.com/Jdjellis/pedigree-canvas/issues/141).
+  Also tracked in [issue #141](https://github.com/ClinTech-dev/pedigree-canvas/issues/141).
 - **Disconnected components**: an unrelated family that shares a generation row is
   treated as a fixed obstacle, so the rooted family may be translated sideways to
   clear it (no overlap or crossing results; the unrelated family never moves).

@@ -247,7 +247,7 @@ invariant — so it is deferred against its blast radius. The reference tool
 **kinship2** solves exactly these shapes this way (draw the person twice, join the
 copies with a dashed arc); see
 [`discussions/auto-spacing-vs-kinship2.md`](discussions/auto-spacing-vs-kinship2.md)
-for the full comparison and [issue #162](https://github.com/Jdjellis/pedigree-canvas/issues/162)
+for the full comparison and [issue #162](https://github.com/ClinTech-dev/pedigree-canvas/issues/162)
 for the duplication design proposal and the clinical constraint that gates it.
 
 **How often does it bite?** A census of 8,000 random `FULL_SPACE` documents
