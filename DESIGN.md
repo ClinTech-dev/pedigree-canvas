@@ -8,7 +8,7 @@ colors:
   ward-green-soft: "#344c3e1a"
   ward-green-soft-strong: "#344c3e29"
   ward-green-border: "#344c3e47"
-  bg: "#fafafa"
+  bg: "#f9fafa"
   surface: "#ffffff"
   border: "#e2e5e3"
   border-strong: "#cfd3d1"
@@ -152,7 +152,7 @@ tool documents clinical reality; it should disappear into that task.
 
 ## 2. Colors
 
-The ClinTech family palette: a neutral off-white workspace, ink-black text and
+The ClinTech family palette: a sage off-white workspace, ink-black text and
 symbols, and Ward Green doing the interactive work. The only
 saturated colours on screen are the user's own condition-shading choices.
 
@@ -179,10 +179,8 @@ saturated colours on screen are the user's own condition-shading choices.
 - **Ink Secondary** (`#515654`, Sage 600): Secondary/muted text — section titles, hints,
   shortcut chips, zoom readout. Holds ≥4.5:1 on the light surfaces; do not push it
   lighter.
-- **Workspace** (`#fafafa`): The app background / canvas backdrop showing through
-  the transparent Konva stage. A deliberate true neutral, not Sage 50: across a
-  full viewport the sage tint reads as green, and this is the paper under the
-  pedigree. Chrome keeps the sage neutrals.
+- **Workspace** (`#f9fafa`, Sage 50): The app background / canvas backdrop showing
+  through the transparent Konva stage.
 - **Surface** (`#ffffff`): Islands, panels, menus, and the fill of open
   (unaffected) symbols.
 - **Border** (`#e2e5e3`, Sage 200) / **Border Strong** (`#cfd3d1`, Sage 300): Hairline
@@ -206,7 +204,7 @@ saturated colours on screen are the user's own condition-shading choices.
 
 ### Comfort Themes (chrome only)
 Three surfaces re-tint the chrome and canvas backdrop, switched via
-`data-theme` on `<html>`: **Light** (default, neutral off-white), **Warm**
+`data-theme` on `<html>`: **Light** (default, sage off-white), **Warm**
 (`#fff8e1` — pale amber, reduces blue light), **Dim** (`#d6d3cd` — low-luminance
 cool grey for dark rooms). All stay light so dark symbols keep their meaning.
 

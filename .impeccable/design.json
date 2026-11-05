@@ -199,7 +199,7 @@
       "refersTo": "mono",
       "description": "Monospace keyboard-shortcut hint chip, as used in the command palette.",
       "html": "<kbd class=\"ds-shortcut\">⌘K</kbd>",
-      "css": ".ds-shortcut { font-family:var(--font-mono, monospace); font-size:11px; color:#515654; background:#fafafa; border:1px solid #e2e5e3; border-radius:4px; padding:1px 5px; white-space:nowrap; }"
+      "css": ".ds-shortcut { font-family:var(--font-mono, monospace); font-size:11px; color:#515654; background:#f9fafa; border:1px solid #e2e5e3; border-radius:4px; padding:1px 5px; white-space:nowrap; }"
     },
     {
       "name": "Radial Menu Option",
