@@ -7,6 +7,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- The repository moved to `ClinTech-dev/pedigree-canvas`; links now point there.
 - Pedigree Canvas now carries the ClinTech family brand: Ward Green and sage
   neutrals replace Clinical Indigo and the cool greys across the editor, landing
   page, favicon and share image, Inter replaces the system font, and the About box
