@@ -257,7 +257,7 @@ export function PropertiesPanel() {
 
   if (!propertiesPanelOpen || !individual) {
     return (
-      <div className={styles.panel}>
+      <div className={styles.panel} data-viewport-chrome="right">
         <div className={styles.empty}>
           Select an individual — or click a relationship line — to edit its
           properties
@@ -306,7 +306,7 @@ export function PropertiesPanel() {
   };
 
   return (
-    <div className={styles.panel}>
+    <div className={styles.panel} data-viewport-chrome="right">
       <fieldset
         disabled={editingLocked}
         style={{ border: 'none', margin: 0, padding: 0, minInlineSize: 0 }}

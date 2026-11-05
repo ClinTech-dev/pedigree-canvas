@@ -50,32 +50,30 @@ describe('useEditorActions document lifecycle', () => {
   });
 
   it('starts a new document without confirming when the doc is effectively empty', () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
     const { result } = renderHook(() => useEditorActions());
 
     result.current.newDocument();
 
-    // Empty (<= 1 individual) → no confirm prompt, and a fresh seed exists.
-    expect(confirmSpy).not.toHaveBeenCalled();
+    // Empty (<= 1 individual) → no confirm dialog, and a fresh seed exists.
+    expect(useUIStore.getState().activeModal).toBeNull();
     const inds = Object.keys(usePedigreeStore.getState().document.individuals);
     expect(inds).toHaveLength(1);
     // The gender picker opens on the seed.
     expect(useUIStore.getState().genderPicker.targetId).toBe(inds[0]);
   });
 
-  it('confirms before replacing a non-empty document and aborts on cancel', () => {
+  it('opens the confirm-new dialog instead of replacing a non-empty document', () => {
     // hasContent is true only with more than one individual.
     usePedigreeStore.getState().setDocument(createDefaultDocument());
     usePedigreeStore.getState().addIndividual(createDefaultIndividual({ id: 'x1' }));
     usePedigreeStore.getState().addIndividual(createDefaultIndividual({ id: 'x2' }));
 
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
     const { result } = renderHook(() => useEditorActions());
 
     result.current.newDocument();
 
-    expect(confirmSpy).toHaveBeenCalledTimes(1);
-    // Cancelled: the two individuals survive.
+    // The dialog (which offers export first) is shown; nothing is replaced yet.
+    expect(useUIStore.getState().activeModal).toBe('confirmNew');
     expect(Object.keys(usePedigreeStore.getState().document.individuals)).toHaveLength(2);
   });
 

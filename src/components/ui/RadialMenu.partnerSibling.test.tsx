@@ -124,3 +124,28 @@ describe('RadialMenu Add Sibling (no parents)', () => {
     expect(useUIStore.getState().genderPicker.targetId).toBe(siblings[0].id);
   });
 });
+
+describe('RadialMenu hover labels (#178)', () => {
+  it('gives each cardinal button a plain-language hover label', () => {
+    seedRoot();
+    render(<RadialMenu />);
+    // The accessible name stays the visible caption…
+    const partner = screen.getByRole('button', { name: 'Partner' });
+    // …while an instant CSS chip spells out what it adds.
+    expect(partner.getAttribute('data-tip')).toBe('Add partner (spouse / mate)');
+    expect(partner.getAttribute('aria-description')).toMatch(/partner/i);
+    expect(screen.getByRole('button', { name: 'Sibling' }).getAttribute('data-tip')).toBe(
+      'Add sibling',
+    );
+    expect(screen.getByRole('button', { name: 'Child' }).getAttribute('data-tip')).toBe(
+      'Add child',
+    );
+    expect(screen.getByRole('button', { name: 'Parent' }).getAttribute('data-tip')).toBe(
+      'Add parents',
+    );
+    // Twin hint uses the platform's modifier name (Alt off a Mac).
+    expect(
+      screen.getByRole('button', { name: 'Sibling' }).getAttribute('aria-description'),
+    ).toMatch(/Hold Alt/);
+  });
+});

@@ -1,16 +1,20 @@
 import { useMemo } from 'react';
-import { usePedigreeStore, createSeededDocument } from '../stores/pedigreeStore';
+import { usePedigreeStore } from '../stores/pedigreeStore';
 import { useUIStore } from '../stores/uiStore';
 import { useViewportStore } from '../stores/viewportStore';
 import { generateId } from '../utils/idGenerator';
 import { computeAnnotationDropPosition } from '../utils/annotationPlacement';
-import { computeContentExtent } from '../utils/boundsCalculation';
+import { fitViewportToContent } from '../utils/viewportChrome';
 import {
   ZOOM_STEP,
   ANNOTATION_DEFAULT_FONT_SIZE,
   ANNOTATION_PLACEHOLDER_TEXT,
 } from '../utils/constants';
-import { openDocumentAction, deleteSelectedAction } from './editorActions';
+import {
+  openDocumentAction,
+  deleteSelectedAction,
+  requestNewDocumentAction,
+} from './editorActions';
 import { getVisibleCanvasCenter } from '../utils/canvasCenter';
 
 /**
@@ -19,7 +23,10 @@ import { getVisibleCanvasCenter } from '../utils/canvasCenter';
  * action bodies elsewhere.
  */
 export interface EditorActions {
-  /** Prompt to confirm, then reset the document, clear selection and view. */
+  /**
+   * Start a new document. When the current one has content, opens the
+   * `confirmNew` dialog (offers export first) instead of replacing it.
+   */
   newDocument: () => void;
   /** Open a JSON file from disk and load it as the current document. */
   openDocument: () => Promise<void>;
@@ -48,8 +55,8 @@ export interface EditorActions {
   /** Reset scale to 100% and pan to origin. */
   resetView: () => void;
   /**
-   * Zoom and pan so the whole pedigree (symbols, labels, and text annotations)
-   * fits centred in the viewport. Falls back to {@link resetView} when the
+   * Zoom and pan so the whole pedigree (symbols, labels, text annotations and
+   * the legend) fits centred in the area not covered by the floating islands. Falls back to {@link resetView} when the
    * document is empty or the canvas has not been measured yet.
    */
   fitView: () => void;
@@ -84,20 +91,7 @@ export interface EditorActions {
  * All store reads inside callbacks use `getState()` to avoid stale closures.
  */
 export function useEditorActions(): EditorActions {
-  const newDocument = (): void => {
-    const hasContent =
-      Object.keys(usePedigreeStore.getState().document.individuals).length > 1;
-    if (hasContent && !window.confirm('Start a new pedigree? Your current one will be cleared.')) {
-      return;
-    }
-    useUIStore.getState().setOnboarded();
-    useViewportStore.getState().resetView();
-    const doc = createSeededDocument(getVisibleCanvasCenter());
-    usePedigreeStore.getState().setDocument(doc);
-    useUIStore.getState().clearSelection();
-    const seedId = Object.keys(doc.individuals)[0];
-    if (seedId) useUIStore.getState().showGenderPicker(seedId);
-  };
+  const newDocument = (): void => requestNewDocumentAction();
 
   const openDocument = (): Promise<void> => openDocumentAction();
 
@@ -163,20 +157,9 @@ export function useEditorActions(): EditorActions {
   };
 
   const fitView = (): void => {
-    const { document: doc } = usePedigreeStore.getState();
-    const extent = computeContentExtent(
-      Object.values(doc.individuals),
-      Object.values(doc.textAnnotations),
-    );
-    // Measure the actual stage element (same stage-local convention as the
-    // placement actions) so the content is centred in the visible canvas.
-    const canvasEl = document.querySelector('.konvajs-content');
-    const rect = canvasEl?.getBoundingClientRect();
-    if (!extent || !rect || rect.width === 0 || rect.height === 0) {
-      useViewportStore.getState().resetView();
-      return;
-    }
-    useViewportStore.getState().fitToContent(extent, rect.width, rect.height);
+    // Fit symbols, labels, annotations AND the on-canvas legend inside the part
+    // of the canvas not covered by the islands (#178); see viewportChrome.ts.
+    if (!fitViewportToContent()) useViewportStore.getState().resetView();
   };
 
   const selectTool = (): void => {

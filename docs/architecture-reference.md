@@ -30,6 +30,21 @@ touching canvas rendering, stores, or export.
   Extract canvas logic into store-operating modules (e.g. `symbolDrag.ts`) and
   unit-test those, not the components.
 
+- **Floating chrome and the visible canvas.** The stage is full-bleed, so the
+  part a user can see is the stage minus the islands. Anything that fits or
+  reveals content (Fit, "keep new parents visible") goes through
+  `utils/viewportChrome.ts`, which measures elements tagged
+  `data-viewport-chrome="top|bottom|left|right"` (App's island slots, the
+  properties panel) and feeds the pure maths in `utils/viewportFit.ts`. Tag new
+  edge-docked chrome the same way. Fit's extent includes the legend via
+  `computeLegendBox` (`utils/legendLayout.ts`), which is also `LegendLayer`'s
+  placement.
+
+- **Shortcut labels are platform-aware.** Author displayed shortcuts Mac-style
+  (`⌘K`, `⌘⇧Z`, `⌥`) and render them through `formatShortcut` /
+  `ariaKeyShortcut` (`utils/platformShortcut.ts`) so Windows/Linux show
+  `Ctrl+K`, `Alt`. Bindings already accept either ⌘ or Ctrl.
+
 ## Feature flags
 
 Toggles for experimental / discoverability affordances live in a single module,

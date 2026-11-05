@@ -5,6 +5,7 @@ import { useCommands } from '../../commands/registry';
 import { filterCommands } from '../../commands/filterCommands';
 import type { Command } from '../../commands/types';
 import styles from './CommandPalette.module.css';
+import { formatShortcut } from '../../utils/platformShortcut';
 
 /**
  * Keyboard-first command launcher, opened with ⌘K / Ctrl+K.
@@ -184,7 +185,7 @@ function CommandPaletteInner({ onClose }: CommandPaletteInnerProps) {
           >
             <span className={styles.itemTitle}>{cmd.title}</span>
             {cmd.shortcut && (
-              <kbd className={styles.shortcut}>{cmd.shortcut}</kbd>
+              <kbd className={styles.shortcut}>{formatShortcut(cmd.shortcut)}</kbd>
             )}
           </li>
         ))}

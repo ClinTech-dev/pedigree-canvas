@@ -48,7 +48,7 @@ describe('RadialMenu multi-parentage (#64)', () => {
     render(<RadialMenu />);
     const parent = screen.getByRole('button', { name: 'Parent' });
     expect(parent.className).not.toMatch(/disabled/);
-    expect(parent.getAttribute('title')).toMatch(/another parent set/i);
+    expect(parent.getAttribute('data-tip')).toMatch(/another parent set/i);
   });
 
   it('attaches a second parent set with its own partnership and link on click', () => {

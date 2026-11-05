@@ -42,3 +42,43 @@ export function legendEntryRowY(idx: number): number {
 export function legendInvestigationRowY(entryCount: number, idx: number): number {
   return PADDING + TITLE_HEIGHT + (entryCount + idx) * ROW_HEIGHT;
 }
+
+/** Gap between the dashed page bounds and the on-canvas legend below it. */
+export const LEGEND_BOUNDS_GAP = 16;
+/** Horizontal inset of the legend from the page bounds' left edge. */
+export const LEGEND_BOUNDS_INSET_X = 10;
+
+/** Canvas-space rectangle of the on-canvas legend. */
+export interface LegendBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Where the on-canvas legend ("Key") is drawn, in canvas space — the single
+ * source for `LegendLayer`'s placement and for "fit to screen", which must
+ * include it (#178).
+ *
+ * With page `bounds` the legend sits just below them, left-aligned; without,
+ * it uses its stored (draggable) `fallbackPosition`.
+ *
+ * @returns The legend rectangle, or `null` when there is nothing to show
+ *   (no condition entries and no investigations).
+ */
+export function computeLegendBox(
+  entries: ReadonlyArray<{ applicableTo?: unknown }>,
+  investigationCount: number,
+  bounds: { x: number; y: number; width: number; height: number } | null | undefined,
+  fallbackPosition: { x: number; y: number },
+): LegendBox | null {
+  if (entries.length === 0 && investigationCount === 0) return null;
+  const hasBothGender = entries.some((e) => !e.applicableTo);
+  return {
+    x: bounds ? bounds.x + LEGEND_BOUNDS_INSET_X : fallbackPosition.x,
+    y: bounds ? bounds.y + bounds.height + LEGEND_BOUNDS_GAP : fallbackPosition.y,
+    width: legendContentWidth(hasBothGender),
+    height: legendContentHeight(entries.length, investigationCount),
+  };
+}

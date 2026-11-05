@@ -333,6 +333,10 @@ decorate a resting card. If it doesn't float over the user's work, it has no sha
 - **Style:** Circular 32px option buttons orbiting a symbol at ±56–72px, white
   surface with hairline border and a subtle `0 1px 4px` shadow. Hover fills **Ward
   Green**; `:active` scales to `0.95`; hovered options scale to `1.1`.
+- **Hover labels:** The four cardinal buttons show an instant dark chip
+  ("Add partner (spouse / mate)") outward from the symbol on hover/focus, since
+  the 8px caption alone was misread. The chip is kept out of the accessible
+  name, which stays the visible caption.
 - **Ghost previews:** MZ/DZ twin options start collapsed (`opacity: 0, scale 0.7`)
   and reveal on ~0.8s dwell or while ⌥ is held — faded (`opacity 0.5`) with a
   **dashed** border to read as a preview, solidifying on hover. This is the app's

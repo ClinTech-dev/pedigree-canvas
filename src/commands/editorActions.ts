@@ -1,9 +1,10 @@
-import { usePedigreeStore } from '../stores/pedigreeStore';
+import { usePedigreeStore, createSeededDocument } from '../stores/pedigreeStore';
 import { useUIStore } from '../stores/uiStore';
 import { useViewportStore } from '../stores/viewportStore';
 import { loadFromFile } from '../io/jsonIO';
 import { TwinType } from '../types/enums';
 import { buildTwinGroup } from '../utils/twinOperations';
+import { getVisibleCanvasCenter } from '../utils/canvasCenter';
 
 /**
  * Module-level action functions that use `getState()` to read store values
@@ -14,6 +15,42 @@ import { buildTwinGroup } from '../utils/twinOperations';
  * Extracting them as plain functions (not hooks) allows keyboard event handlers
  * — which cannot call React hooks — to delegate here without duplicating logic.
  */
+
+/**
+ * True when the current document holds real work (more than the lone seed
+ * person a fresh document starts with) — i.e. replacing it would lose something.
+ */
+export function documentHasContent(): boolean {
+  return Object.keys(usePedigreeStore.getState().document.individuals).length > 1;
+}
+
+/**
+ * Replace the current document with a fresh seeded one, unconditionally:
+ * reset the view, clear the selection and open the gender picker on the seed.
+ * Callers that might discard work go through {@link requestNewDocumentAction}.
+ */
+export function startNewDocumentAction(): void {
+  useUIStore.getState().setOnboarded();
+  useViewportStore.getState().resetView();
+  const doc = createSeededDocument(getVisibleCanvasCenter());
+  usePedigreeStore.getState().setDocument(doc);
+  useUIStore.getState().clearSelection();
+  const seedId = Object.keys(doc.individuals)[0];
+  if (seedId) useUIStore.getState().showGenderPicker(seedId);
+}
+
+/**
+ * "New document" entry point. With nothing to lose it starts fresh at once;
+ * otherwise it opens the `confirmNew` dialog, which explains that the current
+ * pedigree lives only in this browser and offers to export it first (#178).
+ */
+export function requestNewDocumentAction(): void {
+  if (documentHasContent()) {
+    useUIStore.getState().openModal('confirmNew');
+    return;
+  }
+  startNewDocumentAction();
+}
 
 /**
  * Open a JSON file from disk, load it as the current document, clear the

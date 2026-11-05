@@ -33,6 +33,8 @@ export type ActiveModal =
   | 'legendEditor'
   | 'shortcuts'
   | 'help'
+  /** "Start a new pedigree?" — warns the current one will be lost, offers export. */
+  | 'confirmNew'
   | null;
 
 /** What kind of connection an id in {@link ConnectionSelection} refers to. */

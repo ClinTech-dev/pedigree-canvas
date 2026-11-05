@@ -9,6 +9,10 @@ import { RadialMenu } from './RadialMenu';
 import { useUIStore } from '../../stores/uiStore';
 import { usePedigreeStore, createDefaultIndividual } from '../../stores/pedigreeStore';
 import { featureFlags } from '../../config/featureFlags';
+import { formatShortcut } from '../../utils/platformShortcut';
+
+/** The badge's platform label: ⌥ on a Mac, Alt elsewhere (jsdom → Alt). */
+const ALT = formatShortcut('⌥');
 
 const ROOT = 'root';
 
@@ -32,7 +36,7 @@ describe('RadialMenu ⌥ discovery badge (altHint flag)', () => {
     featureFlags.altHint = false;
     render(<RadialMenu />);
     const sibling = screen.getByRole('button', { name: 'Sibling' });
-    expect(within(sibling).queryByText('⌥')).toBeNull();
+    expect(within(sibling).queryByText(ALT)).toBeNull();
   });
 
   it('shows a ⌥ badge on both Sibling and Child when the flag is on', () => {
@@ -40,8 +44,8 @@ describe('RadialMenu ⌥ discovery badge (altHint flag)', () => {
     render(<RadialMenu />);
     const sibling = screen.getByRole('button', { name: 'Sibling' });
     const child = screen.getByRole('button', { name: 'Child' });
-    expect(within(sibling).getByText('⌥')).toBeTruthy();
-    expect(within(child).getByText('⌥')).toBeTruthy();
+    expect(within(sibling).getByText(ALT)).toBeTruthy();
+    expect(within(child).getByText(ALT)).toBeTruthy();
   });
 
   it('keeps the buttons’ accessible names plain when the badge is on', () => {
@@ -51,6 +55,6 @@ describe('RadialMenu ⌥ discovery badge (altHint flag)', () => {
     expect(screen.getByRole('button', { name: 'Sibling' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Child' })).toBeTruthy();
     // Parent/Partner never carry the badge.
-    expect(within(screen.getByRole('button', { name: 'Parent' })).queryByText('⌥')).toBeNull();
+    expect(within(screen.getByRole('button', { name: 'Parent' })).queryByText(ALT)).toBeNull();
   });
 });

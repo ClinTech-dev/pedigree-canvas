@@ -16,6 +16,7 @@ import { AnnotationEditor } from './components/ui/AnnotationEditor';
 import { CommandPalette } from './components/ui/CommandPalette';
 import { ShortcutsOverlay } from './components/ui/ShortcutsOverlay';
 import { HelpOverlay } from './components/ui/HelpOverlay';
+import { NewDocumentDialog } from './components/ui/NewDocumentDialog';
 import { MenuIsland } from './components/ui/islands/MenuIsland';
 import { ToolIsland } from './components/ui/islands/ToolIsland';
 import { ToolHint } from './components/ui/islands/ToolHint';
@@ -61,27 +62,27 @@ function App() {
       </div>
 
       {/* Floating island slots */}
-      <div className={styles.slotTopLeft}>
+      <div className={styles.slotTopLeft} data-viewport-chrome="top">
         <MenuIsland />
       </div>
 
-      <div className={styles.slotTopCenter}>
+      <div className={styles.slotTopCenter} data-viewport-chrome="top">
         <ViewModeBadge />
         <ToolIsland />
         <ToolHint />
       </div>
 
-      <div className={styles.slotTopRight}>
+      <div className={styles.slotTopRight} data-viewport-chrome="top">
         <ActionsIsland />
         <ReformatSuggestion />
       </div>
 
-      <div className={styles.slotBottomLeft}>
+      <div className={styles.slotBottomLeft} data-viewport-chrome="bottom">
         <ZoomIsland />
         <HistoryIsland />
       </div>
 
-      <div className={styles.slotBottomRight}>
+      <div className={styles.slotBottomRight} data-viewport-chrome="bottom">
         <PrivacyBadge />
         <HelpIsland />
         {/* Replaces the (now-hidden) help/privacy chrome while zen mode is on */}
@@ -100,6 +101,7 @@ function App() {
       <CommandPalette />
       <ShortcutsOverlay />
       <HelpOverlay />
+      <NewDocumentDialog />
     </div>
   );
 }

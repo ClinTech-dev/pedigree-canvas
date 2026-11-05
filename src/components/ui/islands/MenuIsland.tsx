@@ -21,6 +21,7 @@ import { SegmentedControl } from '../SegmentedControl';
 import { THEME_ORDER, THEME_LABELS, type ThemeId } from '../../../theme/themes';
 import { Island } from './Island';
 import styles from './MenuIsland.module.css';
+import { formatShortcut, ariaKeyShortcut } from '../../../utils/platformShortcut';
 
 const THEME_OPTIONS: { value: ThemeId; label: string }[] = THEME_ORDER.map(
   (id) => ({ value: id, label: THEME_LABELS[id] }),
@@ -85,7 +86,7 @@ function MenuItemButton({
       className={styles.menuItem}
       onClick={onClick}
       tabIndex={-1}
-      aria-keyshortcuts={shortcut}
+      aria-keyshortcuts={shortcut ? ariaKeyShortcut(shortcut) : undefined}
     >
       <span className={styles.menuItemIcon} aria-hidden="true">
         {icon}
@@ -93,7 +94,7 @@ function MenuItemButton({
       <span className={styles.menuItemLabel}>{label}</span>
       {shortcut && (
         <kbd className={styles.menuItemKbd} aria-hidden="true">
-          {shortcut}
+          {formatShortcut(shortcut)}
         </kbd>
       )}
     </button>
@@ -134,7 +135,7 @@ function MenuToggleItem({
       className={styles.menuItem}
       onClick={onToggle}
       tabIndex={-1}
-      aria-keyshortcuts={shortcut}
+      aria-keyshortcuts={shortcut ? ariaKeyShortcut(shortcut) : undefined}
     >
       <span className={styles.menuItemIcon} aria-hidden="true">
         {icon}
@@ -142,7 +143,7 @@ function MenuToggleItem({
       <span className={styles.menuItemLabel}>{label}</span>
       {shortcut && (
         <kbd className={styles.menuItemKbd} aria-hidden="true">
-          {shortcut}
+          {formatShortcut(shortcut)}
         </kbd>
       )}
       <span className={styles.menuItemCheck} aria-hidden="true">

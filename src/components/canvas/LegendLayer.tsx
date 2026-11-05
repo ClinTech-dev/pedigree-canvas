@@ -21,6 +21,7 @@ import {
   legendContentHeight,
   legendEntryRowY,
   legendInvestigationRowY,
+  computeLegendBox,
 } from '../../utils/legendLayout';
 
 interface LegendLayerProps {
@@ -115,9 +116,16 @@ export const LegendLayer: React.FC<LegendLayerProps> = React.memo(
       onMove({ x: e.target.x(), y: e.target.y() });
     };
 
-    // Position below the bounds rect so the legend never overlaps symbols or their decorators
-    const legendX = bounds ? bounds.x + 10 : legendConfig.position.x;
-    const legendY = bounds ? bounds.y + bounds.height + 16 : legendConfig.position.y;
+    // Position below the bounds rect so the legend never overlaps symbols or
+    // their decorators. Shared with "fit to screen" via computeLegendBox.
+    const box = computeLegendBox(
+      legendConfig.entries,
+      investigations.length,
+      bounds,
+      legendConfig.position,
+    );
+    const legendX = box ? box.x : legendConfig.position.x;
+    const legendY = box ? box.y : legendConfig.position.y;
 
     return (
       <Group

@@ -5,6 +5,7 @@ import { useEditorActions } from '../../commands/useEditorActions';
 import { useUIStore } from '../../stores/uiStore';
 import { shouldShowOnboarding } from './onboarding';
 import styles from './OnboardingHints.module.css';
+import { formatShortcut } from '../../utils/platformShortcut';
 
 /**
  * Excalidraw-style first-run onboarding layer.
@@ -192,7 +193,7 @@ export function OnboardingHints(): ReactElement | null {
         </div>
 
         <p className={styles.shortcutHint}>
-          <kbd className={styles.kbd}>⌘K</kbd> for all commands
+          <kbd className={styles.kbd}>{formatShortcut('⌘K')}</kbd> for all commands
         </p>
       </div>
     </div>

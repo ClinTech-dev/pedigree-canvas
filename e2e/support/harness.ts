@@ -79,5 +79,5 @@ export async function openRadialOnSeed(page: Page): Promise<void> {
   const cy = (viewport?.height ?? 800) / 2;
   await page.mouse.move(cx - 40, cy - 40);
   await page.mouse.move(cx, cy);
-  await expect(page.getByTitle('Add Partner')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Partner', exact: true })).toBeVisible();
 }
