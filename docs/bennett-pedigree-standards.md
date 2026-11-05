@@ -137,8 +137,10 @@ Ongoing / live pregnancy: diamond symbol (sex unknown) or sex-specific symbol wh
 | Type | Visual | App enum |
 |------|--------|----------|
 | Monozygotic (identical) | Two lines meeting at a **single point** on the sibship line, joined by a horizontal bar at the junction | `TwinType.Monozygotic` |
-| Dizygotic (fraternal) | Two lines from **separate points** on the sibship line; no bar | `TwinType.Dizygotic` |
-| Unknown zygosity | Like MZ (single point) but with a "?" | `TwinType.Unknown` |
+| Dizygotic (fraternal) | Two lines meeting at a **single point** on the sibship line; **no** bar | `TwinType.Dizygotic` |
+| Unknown zygosity | Single point with a "?" (no bar) | `TwinType.Unknown` |
+
+Per Bennett et al. 2022, Figure 3: all twins share a single point on the sibship line; the bar marks MZ, a "?" marks unknown zygosity, and "in the absence of a '?' or a connecting line, assumed to be dizygotic". (Corrected 2026-11-05: an earlier revision said DZ twins drop from separate points.)
 
 ---
 

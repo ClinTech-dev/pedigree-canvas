@@ -13,7 +13,9 @@ plus Bennett/NSGC correctness.
   `meta.md`. If the UI is mid-rebrand, note which screens look different.
 
 Use a real browser (Playwright Chromium is fine) at the persona's screen size,
-in a fresh profile with empty storage.
+in a fresh profile with empty storage. The app keeps its document in browser
+storage, so drive one long-lived browser session (for example a script that
+waits for step files) rather than relaunching the browser between steps.
 
 ## Persona behaviour rules
 
@@ -44,32 +46,9 @@ Read to the persona as one block, as at consult pace:
 Then: "Draw this family, and when you're done, save or export it the way you
 would for your work."
 
-## Answer key (Bennett/NSGC; see `docs/bennett-pedigree-standards.md`)
+## Answer key
 
-14 individuals over 4 generations. Score each row ✓ correct, ~ partly, ✗ wrong
-or missing.
-
-| # | Individual | Expected |
-|---|---|---|
-| K1 | Maternal grandmother (I) | Circle; deceased slash; "d. 60s"; cause "stomach trouble" noted as uncertain (e.g. "?" or note); not shaded as a known cancer |
-| K2 | Maternal grandfather (I) | Square, unknown/unaffected; must exist so the mother's sibship has two parents |
-| K3 | Mother (II) | Circle; shaded for ovarian cancer; deceased slash; "OvCa 52", "d. 58" |
-| K4 | Father (II) | Square, unshaded, "70" |
-| K5 | Maternal aunt 1 (II) | Circle; shaded for breast cancer; "BrCa 48" |
-| K6 | Maternal aunt 2 (II) | Circle, unshaded |
-| K7 | Sarah (III) | Circle; shaded breast cancer; **proband arrow** (P); age 42, "BrCa 39"; test result "BRCA2 VUS" |
-| K8 | Brother (III) | Square, unshaded, 45; to Sarah's left or right by age order (older brother left) |
-| K9 | Sarah's husband (III) | Square, partnership line to Sarah |
-| K10 | Brother's wife (III) | Circle, partnership line to brother |
-| K11 | Daughter (IV) | Circle, 14, under Sarah's partnership, older to the left |
-| K12 | Son (IV) | Square, 11 |
-| K13–14 | Twin girls (IV) | Two circles, age 8, from a **single point** on the sibship line, with **"?"** for unknown zygosity (not DZ separate points, not an MZ bar) |
-
-Structure checks:
-- S1 Generations top to bottom; partners on the same level; no crossing lines.
-- S2 Legend present with two conditions (breast cancer, ovarian cancer), distinguishable.
-- S3 Sarah is the proband (arrow); consultand marking optional.
-- S4 Export produced (which format, and whether it opens and looks right).
+The answer key is in [`answer-key.md`](answer-key.md). Agents running a test must not open it until they have finished drawing and exporting.
 
 ## Persona-specific extension (after the main task, if budget remains)
 
