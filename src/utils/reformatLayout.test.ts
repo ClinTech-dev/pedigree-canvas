@@ -24,6 +24,7 @@ import {
   boundedPartnerDistance,
   chartWidth,
   twinContiguity,
+  siblingBirthOrder,
 } from './__fixtures__/invariants';
 import type { Positions } from './__fixtures__/invariants';
 
@@ -87,6 +88,10 @@ describe('reformatLayout produces a valid layout for every existing fixture', ()
     it(`${name}: keeps twin-group members contiguous`, () => {
       const pos = reformatted(doc);
       expect(twinContiguity(pos, doc, twinGroups ?? {}).ok).toBe(true);
+    });
+    it(`${name}: keeps every sibship with known ages in birth order`, () => {
+      const pos = reformatted(doc);
+      expect(siblingBirthOrder(pos, doc).violations).toEqual([]);
     });
   }
 });

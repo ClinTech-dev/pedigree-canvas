@@ -17,7 +17,7 @@ import type {
   ParentChildRelationship,
   TwinGroup,
 } from '../../types/pedigree';
-import { RelationshipType, TwinType } from '../../types/enums';
+import { RelationshipType, TwinType, VitalStatus } from '../../types/enums';
 import { createDefaultIndividual } from '../../stores/pedigreeStore';
 import type { LayoutDoc } from '../treeLayout';
 
@@ -1166,6 +1166,76 @@ export function cousinCoupleSubtreeCollision(): Fixture {
   };
 }
 
+/**
+ * A sibship seeded **out of birth order** (issue #172, persona usability round
+ * 1): the canvas shows a son aged 11 left of his sister aged 14, and the oldest
+ * (20) on the far right — the shape the per-edit engine leaves when siblings
+ * are always appended on the right and ages are filled in afterwards.
+ *
+ * Also exercises every rule of the ordering:
+ * - `c14` is married (`sp`, no parents of their own) with a child — the couple
+ *   and its descent move as one block;
+ * - `cu` has no age (unknown) and must keep its slot;
+ * - `ta`/`tb` are MZ twins, only `ta` with an age (9) — the twin group moves as
+ *   one contiguous unit keyed by its known member (issue #154 must not regress);
+ * - `cd` is deceased with age 50: an age at death says nothing about birth
+ *   order, so it is unknown and keeps its slot.
+ *
+ * `reformatLayout` must produce `c20, c14, cu, c11, ta|tb, cd` left to right.
+ */
+export function birthOrderSibship(): Fixture {
+  const aged = (
+    id: string,
+    x: number,
+    generation: number,
+    age: number,
+    extra: Partial<Individual> = {},
+  ): Individual => ({ ...ind(id, x, generation), age, ...extra });
+  const twinGroups: Record<string, TwinGroup> = {
+    tw: {
+      id: 'tw',
+      twinType: TwinType.Monozygotic,
+      individualIds: ['ta', 'tb'],
+      parentPartnershipId: 'u',
+    },
+  };
+  return {
+    name: 'birthOrderSibship',
+    doc: doc({
+      individuals: {
+        m: ind('m', 260, 0),
+        f: ind('f', 380, 0),
+        c11: aged('c11', 0, 1, 11),
+        c14: aged('c14', 80, 1, 14),
+        sp: ind('sp', 200, 1),
+        cu: ind('cu', 320, 1),
+        ta: aged('ta', 400, 1, 9),
+        tb: ind('tb', 480, 1),
+        c20: aged('c20', 560, 1, 20),
+        cd: aged('cd', 640, 1, 50, { vitalStatus: VitalStatus.Deceased }),
+        gk: ind('gk', 140, 2),
+      },
+      partnerships: {
+        u: union('u', 'm', 'f', ['c11', 'c14', 'cu', 'ta', 'tb', 'c20', 'cd']),
+        uc: union('uc', 'c14', 'sp', ['gk']),
+      },
+      parentChildLinks: {
+        l1: link('l1', 'u', 'c11'),
+        l2: link('l2', 'u', 'c14'),
+        l3: link('l3', 'u', 'cu'),
+        l4: link('l4', 'u', 'ta'),
+        l5: link('l5', 'u', 'tb'),
+        l6: link('l6', 'u', 'c20'),
+        l7: link('l7', 'u', 'cd'),
+        l8: link('l8', 'uc', 'gk'),
+      },
+      twinGroups,
+    }),
+    rootUnionId: 'u',
+    twinGroups,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Exported fixture array
 // ---------------------------------------------------------------------------
@@ -1201,4 +1271,5 @@ export const ALL_FIXTURES: Array<() => Fixture> = [
   consanguineousSibCouple,
   crossBranchChainCrossing,
   cousinCoupleSubtreeCollision,
+  birthOrderSibship,
 ];

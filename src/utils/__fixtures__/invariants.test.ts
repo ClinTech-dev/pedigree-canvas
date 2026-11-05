@@ -3,13 +3,13 @@ import {
   finalPositions, noSymbolOverlap, minSiblingSpacing, minPartnerSpacing,
   generationRowAlignment, noCrossedDescentLines, subtreeNonCollision,
   manualOrderPreserved, twinContiguity, anchorStability,
-  noNodeBetweenPartners, boundedPartnerDistance, chartWidth,
+  noNodeBetweenPartners, boundedPartnerDistance, chartWidth, siblingBirthOrder,
 } from './invariants';
 import type { Positions } from './invariants';
 import type { LayoutDoc } from '../treeLayout';
 import { DEFAULT_LAYOUT_SPACING } from '../treeLayout';
 import type { Individual, PartnershipRelationship, ParentChildRelationship, TwinGroup } from '../../types/pedigree';
-import { RelationshipType, TwinType } from '../../types/enums';
+import { RelationshipType, TwinType, VitalStatus } from '../../types/enums';
 import { createDefaultIndividual } from '../../stores/pedigreeStore';
 
 function ind(id: string, x: number, generation = 0): Individual {
@@ -432,5 +432,75 @@ describe('chartWidth', () => {
   it('passes a single-node row (bound and span both zero)', () => {
     const d = doc({ individuals: { a: ind('a', 0, 0) } });
     expect(chartWidth({ a: { x: 0, y: 0 } }, d, DEFAULT_LAYOUT_SPACING, 2).ok).toBe(true);
+  });
+});
+
+describe('siblingBirthOrder (#172)', () => {
+  const aged = (id: string, x: number, age: unknown): Individual => ({
+    ...ind(id, x, 1),
+    age: age as number,
+  });
+  /** Parents p/q with children a, b, c at the given ages, laid out at x = 0, 80, 160. */
+  function sibship(ages: [unknown, unknown, unknown], extra: Partial<LayoutDoc> = {}): LayoutDoc {
+    return {
+      individuals: {
+        p: ind('p', 40, 0), q: ind('q', 120, 0),
+        a: aged('a', 0, ages[0]), b: aged('b', 80, ages[1]), c: aged('c', 160, ages[2]),
+        ...extra.individuals,
+      },
+      partnerships: { u: union('u', 'p', 'q', ['a', 'b', 'c']), ...extra.partnerships },
+      parentChildLinks: {
+        la: link('la', 'u', 'a'), lb: link('lb', 'u', 'b'), lc: link('lc', 'u', 'c'),
+        ...extra.parentChildLinks,
+      },
+      ...(extra.twinGroups ? { twinGroups: extra.twinGroups } : {}),
+    };
+  }
+  const pos = (d: LayoutDoc): Positions => finalPositions(d, {});
+
+  it('passes oldest-left and ignores unknown ages', () => {
+    const d = sibship([40, undefined, 30]);
+    expect(siblingBirthOrder(pos(d), d).ok).toBe(true);
+  });
+
+  it('flags a younger sibling left of an older one', () => {
+    const d = sibship([11, undefined, 14]);
+    const r = siblingBirthOrder(pos(d), d);
+    expect(r.ok).toBe(false);
+    expect(r.violations[0].ids).toEqual(['u', 'c', 'a']);
+  });
+
+  it('treats "60s", a deceased age-at-death and equal ages as unconstrained', () => {
+    const d1 = sibship(['60s', 30, 40]);
+    expect(siblingBirthOrder(pos(d1), d1).violations).toHaveLength(1); // only b(30) vs c(40)
+    const d2 = sibship([20, 30, 30]);
+    d2.individuals.b = { ...d2.individuals.b, vitalStatus: VitalStatus.Deceased };
+    expect(siblingBirthOrder(pos(d2), d2).violations.map((v) => v.ids)).toEqual([['u', 'c', 'a']]);
+    const d3 = sibship([30, 30, 30]);
+    expect(siblingBirthOrder(pos(d3), d3).ok).toBe(true);
+  });
+
+  it('orders a twin group as one unit keyed by its known member', () => {
+    const twinGroups: Record<string, TwinGroup> = {
+      t: { id: 't', twinType: TwinType.Monozygotic, individualIds: ['a', 'b'], parentPartnershipId: 'u' },
+    };
+    // Twins a (?) / b (5) left of c (10): the twin unit is younger → violation for both.
+    const d = sibship([undefined, 5, 10], { twinGroups });
+    expect(siblingBirthOrder(pos(d), d).violations).toHaveLength(2);
+    // Twins a (12) / b (?) left of c (10): fine.
+    const ok = sibship([12, undefined, 10], { twinGroups });
+    expect(siblingBirthOrder(pos(ok), ok).ok).toBe(true);
+  });
+
+  it('exempts a sibling married to a spouse with parents of their own (cross-branch)', () => {
+    // c (40) is married to s, whose own parents x/y are in the chart.
+    const d = sibship([10, undefined, 40], {
+      individuals: {
+        s: ind('s', 240, 1), x: ind('x', 200, 0), y: ind('y', 320, 0),
+      },
+      partnerships: { cs: union('cs', 'c', 's'), xy: union('xy', 'x', 'y', ['s']) },
+      parentChildLinks: { ls: link('ls', 'xy', 's') },
+    });
+    expect(siblingBirthOrder(pos(d), d).ok).toBe(true);
   });
 });

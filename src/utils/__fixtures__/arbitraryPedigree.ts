@@ -25,6 +25,13 @@ export interface PedigreeGenOptions {
   maxGenerations: number;
   maxFounderFamilies: number;
   maxChildrenPerUnion: number;
+  /**
+   * Sprinkle ages over the generated individuals (issue #172) so the
+   * `siblingBirthOrder` constraint is exercised: each person gets a numeric age,
+   * no age, or an unparseable string like `"60s"` (unknown). Drawn after the
+   * topology, so it never perturbs the structural draws.
+   */
+  withAges?: boolean;
 }
 
 /**
@@ -52,6 +59,7 @@ export const SUPPORTED_SPACE: PedigreeGenOptions = {
   maxGenerations: 4,
   maxFounderFamilies: 3,
   maxChildrenPerUnion: 3,
+  withAges: true,
 };
 
 /** The full topology space, including the known-unhandled shapes. Fed to the
@@ -63,6 +71,7 @@ export const FULL_SPACE: PedigreeGenOptions = {
   maxGenerations: 4,
   maxFounderFamilies: 3,
   maxChildrenPerUnion: 3,
+  withAges: true,
 };
 
 /**
@@ -195,6 +204,20 @@ function buildDoc(gen: fc.GeneratorValue, opts: PedigreeGenOptions): LayoutDoc {
     const hub = eligible[gen(fc.integer, { min: 0, max: eligible.length - 1 })];
     const hg = individuals[hub].generation as number;
     while ((unionDegree.get(hub) ?? 0) < opts.maxUnionDegree) addUnion(hub, addInd(hg));
+  }
+
+  // Ages (issue #172): drawn last so the topology draws above are unchanged.
+  if (opts.withAges) {
+    for (const id of Object.keys(individuals)) {
+      const kind = gen(fc.integer, { min: 0, max: 3 });
+      if (kind === 0) continue; // unknown: no age
+      individuals[id] = {
+        ...individuals[id],
+        // The age field may carry non-numeric strings (e.g. "60s"); they must
+        // parse as unknown, never crash or reorder.
+        age: (kind === 3 ? '60s' : gen(fc.integer, { min: 0, max: 90 })) as number,
+      };
+    }
   }
 
   return { individuals, partnerships, parentChildLinks, twinGroups };

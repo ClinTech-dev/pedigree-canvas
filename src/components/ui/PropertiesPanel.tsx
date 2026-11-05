@@ -117,6 +117,7 @@ export function PropertiesPanel() {
   const legendConfig = usePedigreeStore((s) => s.document.legendConfig);
   const twinGroups = usePedigreeStore((s) => s.document.twinGroups);
   const updateIndividual = usePedigreeStore((s) => s.updateIndividual);
+  const placeInBirthOrder = usePedigreeStore((s) => s.placeInBirthOrder);
   const updateLegendEntry = usePedigreeStore((s) => s.updateLegendEntry);
   const addLegendEntry = usePedigreeStore((s) => s.addLegendEntry);
   const updateTwinGroup = usePedigreeStore((s) => s.updateTwinGroup);
@@ -666,6 +667,11 @@ export function PropertiesPanel() {
                     : undefined,
                 })
               }
+              // Commit-time birth-order placement (issue #172): once the age is
+              // entered, slide this person to their oldest-left slot among
+              // siblings. On blur, not per keystroke, so typing "45" never
+              // flashes the sibling through the "4" position.
+              onBlur={() => placeInBirthOrder(individual.id)}
               placeholder="Age"
               min={0}
             />

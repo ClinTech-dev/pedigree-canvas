@@ -12,6 +12,13 @@ import type {
   TwinGroup,
 } from '../types/pedigree';
 import { GENERATION_SPACING, MIN_GENERATION_NODE_SPACING } from './constants';
+import {
+  birthKey,
+  birthOrderPermutation,
+  residualHubFamilies,
+  tetheredIndividuals,
+  unitBirthKey,
+} from './birthOrder';
 
 /**
  * Whole-document "re-tidy" layout (issue #137). A layered (Sugiyama /
@@ -32,7 +39,10 @@ export function reformatLayout(
   doc: LayoutDoc,
   spacing: LayoutSpacing = DEFAULT_LAYOUT_SPACING,
 ): Record<string, { x: number; y: number }> {
-  const first = reformatPass(doc, spacing);
+  // One reference time for the whole reformat, so age-derived birth keys are
+  // identical across the internal fixed-point passes (issue #172).
+  const now = Date.now();
+  const first = reformatPass(doc, spacing, now);
   if (!first.crossBranchSeen) return first.moves;
 
   // On a document with a cross-branch couple, one pass may not be the engine's
@@ -56,7 +66,7 @@ export function reformatLayout(
   });
   let settled = settle(doc, first.moves);
   for (let i = 0; i < 6; i++) {
-    const next = reformatPass(settled, spacing);
+    const next = reformatPass(settled, spacing, now);
     let maxDelta = 0;
     for (const [id, p] of Object.entries(next.moves)) {
       const cur = settled.individuals[id].position;
@@ -81,6 +91,7 @@ export function reformatLayout(
 function reformatPass(
   doc: LayoutDoc,
   spacing: LayoutSpacing,
+  now: number,
 ): { moves: Record<string, { x: number; y: number }>; crossBranchSeen: boolean } {
   const ids = Object.keys(doc.individuals);
   if (ids.length === 0) return { moves: {}, crossBranchSeen: false };
@@ -138,12 +149,25 @@ function reformatPass(
 
   // --- Phase 2: ordering ---------------------------------------------------
   const order = new Map<number, string[][]>();
+
+  // Birth order (issue #172): Bennett/NSGC draw a sibship oldest-left. Every
+  // row ordering below is followed by `birthOrderRow`, which permutes each
+  // sibship's chains among the slots they already hold so siblings with a known
+  // age / date of birth read oldest-left (unknown-age siblings stay put). Doing
+  // it inside the sweeps, not once at the end, lets the rows below follow.
+  const twinGroups = doc.twinGroups ?? {};
+  const birthCtx = buildBirthOrderContext(doc, parentsOf, twinGroups, now);
+  const birthOrderRow = (g: number): void => {
+    order.set(g, orderSibshipsByBirth(order.get(g)!, birthCtx));
+  };
+
   for (const g of gens) {
     order.set(g, buildChains(rowIds.get(g)!, rowPartners, seedX));
   }
   // Seed chain order by mean seed x of members (id tie-break).
   for (const g of gens) {
     order.set(g, sortChains(order.get(g)!, (c) => meanBy(c, seedX)));
+    birthOrderRow(g);
   }
 
   // Fractional position of each node within its row: `(index + 0.5) / rowSize`,
@@ -173,9 +197,12 @@ function reformatPass(
 
   // Twin contiguity: barycentre ordering keeps siblings together but leaves a
   // non-twin free to tie-break its way between two twins. Pull each twin group's
-  // members into a contiguous run as a final ordering constraint.
-  const twinGroups = doc.twinGroups ?? {};
+  // members into a contiguous run as a final ordering constraint. Birth order is
+  // re-imposed on the contiguous runs (a twin group moves as one unit), and the
+  // twin pass repeated in case a foreign chain sat between a sibship's slots.
   for (const g of gens) {
+    order.set(g, makeTwinsContiguous(order.get(g)!, twinGroups));
+    birthOrderRow(g);
     order.set(g, makeTwinsContiguous(order.get(g)!, twinGroups));
   }
 
@@ -218,6 +245,7 @@ function reformatPass(
       return keys.reduce((a, b) => a + b, 0) / keys.length;
     };
     order.set(g, sortChains(chains, key));
+    birthOrderRow(g);
   }
 
   // --- Phase 3: coordinates ------------------------------------------------
@@ -1281,4 +1309,183 @@ function orderChainMembers(
   // Any members not reached by the walk (branchy hub) are appended by seed x.
   for (const id of [...comp].sort(bySeed)) if (!seen.has(id)) ordered.push(id);
   return ordered;
+}
+
+/** Precomputed, per-pass inputs for {@link orderSibshipsByBirth}. */
+interface BirthOrderContext {
+  /** Each union's present children with ≥2 members whose birth order is knowable. */
+  sibships: string[][];
+  /** Birth key per individual (twin members carry their group's key). */
+  key: Map<string, number | null>;
+  /** Rank of each ordered-sibship member in its sibship by seed x (id tie-break). */
+  seedRank: Map<string, number>;
+  /** Twin-group id per twin member (only groups with ≥2 present members). */
+  twinOf: Map<string, string>;
+  /** True when the individual has at least one present parent. */
+  hasParents: (id: string) => boolean;
+  /** Individuals tethered to another family ({@link tetheredIndividuals}). */
+  tethered: Set<string>;
+}
+
+function buildBirthOrderContext(
+  doc: LayoutDoc,
+  parentsOf: Map<string, string[]>,
+  twinGroups: Record<string, TwinGroup>,
+  now: number,
+): BirthOrderContext {
+  const key = new Map<string, number | null>();
+  for (const [id, ind] of Object.entries(doc.individuals)) key.set(id, birthKey(ind, now));
+
+  const twinOf = new Map<string, string>();
+  for (const g of Object.values(twinGroups)) {
+    const members = g.individualIds.filter((id) => doc.individuals[id]);
+    if (members.length < 2) continue;
+    for (const id of members) twinOf.set(id, g.id);
+    // A twin group is ordered as one unit: its key is the earliest known member key.
+    const k = unitBirthKey(members.map((id) => key.get(id) ?? null));
+    for (const id of members) key.set(id, k);
+  }
+
+  // Only a sibship with two or more known-key units has a birth order to
+  // impose; every other sibship is left entirely to the barycentre sweeps. So
+  // is any sibship in a family holding a married twin or a 3+-union hub (open
+  // residual 1b, #149 / #159), whose linear layout already balances competing constraints.
+  const sibships: string[][] = [];
+  const seedRank = new Map<string, number>();
+  let residualFamily: Set<string> | null = null;
+  for (const u of Object.values(doc.partnerships)) {
+    const kids = u.childrenIds.filter((id) => doc.individuals[id]);
+    const knownUnits = new Set(
+      kids.filter((id) => key.get(id) !== null).map((id) => twinOf.get(id) ?? id),
+    );
+    if (knownUnits.size < 2) continue;
+    residualFamily ??= residualHubFamilies(doc);
+    if (residualFamily.has(kids[0])) continue;
+    sibships.push(kids);
+    [...kids]
+      .sort((a, b) => {
+        const dx = doc.individuals[a].position.x - doc.individuals[b].position.x;
+        return dx !== 0 ? dx : a < b ? -1 : 1;
+      })
+      .forEach((id, i) => seedRank.set(id, i));
+  }
+  return {
+    sibships,
+    key,
+    seedRank,
+    twinOf,
+    hasParents: (id) => (parentsOf.get(id)?.length ?? 0) > 0,
+    tethered: sibships.length > 0 ? tetheredIndividuals(doc) : new Set(),
+  };
+}
+
+/**
+ * Put each sibship on this row into birth order, oldest left (issue #172).
+ *
+ * A sibling is ordered by moving its whole **chain** (it plus its same-row
+ * spouses), so couples stay adjacent. The sibship's chains are permuted only
+ * among the slots they already occupy, so foreign chains (cousins, other
+ * families) never move. Units are single siblings or whole twin groups; a unit
+ * with an unknown key keeps its place ({@link birthOrderPermutation}).
+ *
+ * A unit is **pinned** (held in place like an unknown) when
+ * - its chains are shared with another sibling of the same sibship (a
+ *   consanguineous sib-union), so the permutation stays one of whole chains; or
+ * - a chain holds a load-bearing spouse from outside the sibship (a spouse with
+ *   their own parents in the chart — a cross-branch couple), whose position is
+ *   set by two families at once; moving it for birth order would fight the
+ *   barycentre / cross-branch phases and tangle descent lines; or
+ * - such a cross-branch couple sits further down the sibling's line of descent
+ *   ({@link tetheredIndividuals}) — the same tether, one or more rows lower.
+ *
+ * Pure; returns the same array when nothing needs to change.
+ */
+function orderSibshipsByBirth(chains: string[][], ctx: BirthOrderContext): string[][] {
+  if (ctx.sibships.length === 0) return chains;
+  let out = chains;
+  for (const sib of ctx.sibships) {
+    const chainOf = new Map<string, number>();
+    out.forEach((c, i) => c.forEach((id) => chainOf.set(id, i)));
+    const members = sib.filter((id) => chainOf.has(id));
+    if (members.length < 2) continue;
+
+    // Group members into units (twin group or single), then merge units that
+    // share a chain (union-find over unit labels).
+    const label = (id: string): string => ctx.twinOf.get(id) ?? id;
+    const parent = new Map<string, string>();
+    const find = (a: string): string => {
+      let r = a;
+      while (parent.get(r) !== r) r = parent.get(r)!;
+      return r;
+    };
+    for (const id of members) parent.set(label(id), label(id));
+    const chainOwner = new Map<number, string>();
+    for (const id of members) {
+      const ci = chainOf.get(id)!;
+      const owner = chainOwner.get(ci);
+      if (owner === undefined) {
+        chainOwner.set(ci, label(id));
+      } else {
+        const ra = find(owner);
+        const rb = find(label(id));
+        if (ra !== rb) parent.set(rb, ra);
+      }
+    }
+    const unitChains = new Map<string, Set<number>>();
+    const unitIds = new Map<string, string[]>();
+    for (const id of members) {
+      const r = find(label(id));
+      const set = unitChains.get(r) ?? new Set<number>();
+      set.add(chainOf.get(id)!);
+      unitChains.set(r, set);
+      const ids = unitIds.get(r) ?? [];
+      ids.push(id);
+      unitIds.set(r, ids);
+    }
+    const sibSet = new Set(sib);
+    const pinnedRoots = new Set<string>();
+    for (const [r, ids] of unitIds) {
+      // Two unit labels collapsed into one root: a chain shared by two siblings.
+      if (new Set(ids.map(label)).size > 1) pinnedRoots.add(r);
+      // A chain holding a load-bearing spouse (one with parents of their own in
+      // the chart — a cross-branch couple): its place is set by both families,
+      // so birth order must not drag it away from the other family.
+      for (const ci of unitChains.get(r)!) {
+        if (out[ci].some((id) => !sibSet.has(id) && ctx.hasParents(id))) pinnedRoots.add(r);
+      }
+      // A cross-branch couple further down this sibling's line of descent
+      // tethers the whole line to another family in the same way.
+      if (ids.some((id) => ctx.tethered.has(id))) pinnedRoots.add(r);
+    }
+
+    // The order the permutation starts from. With nothing pinned it is the
+    // user's own left-to-right order (seed x), so an unknown-age sibling keeps
+    // its place relative to its siblings however the barycentre sweeps shuffled
+    // the tied sibship. A pinned unit needs the sweeps' freedom (it follows
+    // another family), so then the sweeps' current order is the start instead.
+    const seedFirst = pinnedRoots.size === 0;
+    const rankOf = (u: { r: string; chains: number[] }): number =>
+      seedFirst
+        ? Math.min(...unitIds.get(u.r)!.map((id) => ctx.seedRank.get(id) ?? Infinity))
+        : u.chains[0];
+    const units = [...unitChains.entries()]
+      .map(([r, set]) => ({ r, chains: [...set].sort((a, b) => a - b) }))
+      .sort((a, b) => rankOf(a) - rankOf(b) || a.chains[0] - b.chains[0]);
+    const perm = birthOrderPermutation(
+      units.map((u) => ({
+        key: unitBirthKey(unitIds.get(u.r)!.map((id) => ctx.key.get(id) ?? null)),
+        pinned: pinnedRoots.has(u.r),
+      })),
+    );
+
+    const slots = units.flatMap((u) => u.chains).sort((a, b) => a - b);
+    const seq = perm.flatMap((ui) => units[ui].chains.map((ci) => out[ci]));
+    if (seq.every((c, k) => c === out[slots[k]])) continue;
+    const next = [...out];
+    slots.forEach((slot, k) => {
+      next[slot] = seq[k];
+    });
+    out = next;
+  }
+  return out;
 }
