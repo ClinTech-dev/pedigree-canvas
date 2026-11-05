@@ -32,8 +32,10 @@
 }
 
 :root {
-  /* The ClinTech family neutrals (sage) shared with Issued. */
-  --color-bg: #f9fafa;
+  /* The ClinTech family neutrals (sage) shared with Issued. The workspace is a
+     true neutral rather than Sage 50: it is the paper under the pedigree, and
+     across a full viewport the sage tint reads as green. */
+  --color-bg: #fafafa;
   --color-surface: #ffffff;
   --color-surface-hover: #f1f3f2;
   --color-border: #e2e5e3;
