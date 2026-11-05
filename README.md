@@ -1,8 +1,10 @@
 # Pedigree Canvas
 
 > Clinical pedigree drawing for geneticists and genetic counsellors.
+>
+> A [ClinTech](https://clintech.com.au) product.
 
-[![CI](https://github.com/Jdjellis/pedigree-canvas/actions/workflows/ci.yml/badge.svg)](https://github.com/Jdjellis/pedigree-canvas/actions/workflows/ci.yml)
+[![CI](https://github.com/ClinTech-dev/pedigree-canvas/actions/workflows/ci.yml/badge.svg)](https://github.com/ClinTech-dev/pedigree-canvas/actions/workflows/ci.yml)
 
 **Pedigree Canvas** is a local-first clinical pedigree drawing tool for geneticists
 and genetic counsellors. Build standardised family pedigrees with clinical genetics
@@ -78,7 +80,7 @@ no liability for clinical use.
 
 ## Status
 
-Active development. See the [issues](https://github.com/Jdjellis/pedigree-canvas/issues) for
+Active development. See the [issues](https://github.com/ClinTech-dev/pedigree-canvas/issues) for
 the current roadmap.
 
 ## License

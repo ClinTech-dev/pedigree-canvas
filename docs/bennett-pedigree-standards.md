@@ -262,7 +262,7 @@ resource — **none** define a convention for showing a person twice:
   is only ever the double-line *relationship* notation, never a duplicate person.
 
 **Two consequences for any future duplication feature (e.g. layout residual 1b —
-the 3+-union hub / married-twin case, [#149](https://github.com/Jdjellis/pedigree-canvas/issues/149) / [#150](https://github.com/Jdjellis/pedigree-canvas/issues/150)):**
+the 3+-union hub / married-twin case, [#149](https://github.com/ClinTech-dev/pedigree-canvas/issues/149) / [#150](https://github.com/ClinTech-dev/pedigree-canvas/issues/150)):**
 
 1. **It would be non-standard notation** — introduce it deliberately, with an
    explicit on-canvas label/legend key so a reader isn't left guessing that two

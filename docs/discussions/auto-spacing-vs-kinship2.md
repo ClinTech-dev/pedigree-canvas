@@ -4,7 +4,7 @@
 > comparison of Pedigree Canvas's auto-layout engines against the R package
 > **kinship2** (Terry Therneau's `align.pedigree`), to inform design decisions —
 > in particular the open **residual 1b** and whether to adopt kinship2's
-> node-duplication strategy (see [#149](https://github.com/Jdjellis/pedigree-canvas/issues/149) / [#150](https://github.com/Jdjellis/pedigree-canvas/issues/150)).
+> node-duplication strategy (see [#149](https://github.com/ClinTech-dev/pedigree-canvas/issues/149) / [#150](https://github.com/ClinTech-dev/pedigree-canvas/issues/150)).
 >
 > **Read first:** [`auto-layout.md`](../auto-layout.md) (our engines) and
 > [`architecture-reference.md` → Auto-spacing](../architecture-reference.md#auto-spacing).
@@ -252,7 +252,7 @@ an MZ bar, and a `?` for unknown zygosity.
 duplication if needed). Pedigree Canvas's `makeTwinsContiguous` only pulls
 *single-node* chains, so a non-twin sibling can tie-break between a coupled twin and
 its co-twin — the `twinContiguity` half of residual 1b
-([#150](https://github.com/Jdjellis/pedigree-canvas/issues/150)). kinship2 is more
+([#150](https://github.com/ClinTech-dev/pedigree-canvas/issues/150)). kinship2 is more
 robust here.
 
 ## 11. Optimization paradigm & failure modes
@@ -312,8 +312,8 @@ unsolved topologies (residual 1b) in exchange for never duplicating a person.**
 ## 13. Implication for residual 1b
 
 kinship2 is **direct prior art** for the node-duplication fix option floated in
-[#149](https://github.com/Jdjellis/pedigree-canvas/issues/149) /
-[#150](https://github.com/Jdjellis/pedigree-canvas/issues/150): its entire strategy
+[#149](https://github.com/ClinTech-dev/pedigree-canvas/issues/149) /
+[#150](https://github.com/ClinTech-dev/pedigree-canvas/issues/150): its entire strategy
 for the shapes we leave as residual 1b is to duplicate the over-constrained
 individual and connect the copies with a dashed arc. Adopting it would trade our
 "one symbol per person" guarantee for kinship2-style completeness. The decision is

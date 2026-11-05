@@ -4,19 +4,19 @@
   "title": "Design System: Pedigree Canvas",
   "extensions": {
     "colorMeta": {
-      "clinical-indigo": {
+      "ward-green": {
         "role": "primary",
-        "displayName": "Clinical Indigo",
-        "canonical": "oklch(0.484 0.191 279)",
+        "displayName": "Ward Green",
+        "canonical": "oklch(0.38 0.03 155)",
         "tonalRamp": [
-          "oklch(0.15 0.12 279)",
-          "oklch(0.24 0.16 279)",
-          "oklch(0.33 0.185 279)",
-          "oklch(0.42 0.19 279)",
-          "oklch(0.484 0.191 279)",
-          "oklch(0.60 0.15 279)",
-          "oklch(0.76 0.09 279)",
-          "oklch(0.95 0.04 279)"
+          "oklch(0.15 0.040 155)",
+          "oklch(0.24 0.040 155)",
+          "oklch(0.33 0.040 155)",
+          "oklch(0.42 0.040 155)",
+          "oklch(0.484 0.040 155)",
+          "oklch(0.60 0.040 155)",
+          "oklch(0.76 0.040 155)",
+          "oklch(0.95 0.040 155)"
         ]
       },
       "ink": {
@@ -127,7 +127,7 @@
     },
     "typographyMeta": {
       "title": { "displayName": "Section Title", "purpose": "11px uppercase, 0.05em tracking. In-panel section headers only — the one legitimate tracked-uppercase." },
-      "body": { "displayName": "Body", "purpose": "13–15px system sans. Panel content, command rows, inputs." },
+      "body": { "displayName": "Body", "purpose": "13–15px Inter. Panel content, command rows, inputs." },
       "label": { "displayName": "Label", "purpose": "12px medium. Field labels, tool captions, text buttons." },
       "mono": { "displayName": "Mono / Shortcut", "purpose": "11px monospace. Keyboard-shortcut chips only." },
       "annotation": { "displayName": "Annotation (Caveat)", "purpose": "The one loaded webfont. Hand-written free-text notes on the canvas, never in chrome." }
@@ -149,7 +149,7 @@
     "notes": {
       "breakpoints": "None. Desktop-first, full-viewport single-canvas SPA; responsiveness is structural (floating slots), not breakpoint-driven.",
       "reducedMotion": "GAP: no prefers-reduced-motion handling exists yet. fadeIn/slideIn/radial transitions should gain a reduced-motion fallback.",
-      "fonts": "The UI commits to the native OS fonts: system-ui for the sans role, the system monospace stack for the mono role. Only Caveat is web-loaded, for on-canvas annotations."
+      "fonts": "Inter, self-hosted from public/fonts, carries all UI type; the system monospace stack is for shortcut chips. Caveat, also self-hosted, is for first-run hints and landing notes only. The app makes no third-party font requests."
     }
   },
   "components": [
@@ -157,9 +157,9 @@
       "name": "Icon Button (island)",
       "kind": "button",
       "refersTo": "icon-button",
-      "description": "The square 32×32 icon control used across every floating island; takes an indigo-soft active state.",
+      "description": "The square 32×32 icon control used across every floating island; takes an green-soft active state.",
       "html": "<button class=\"ds-icon-btn\" aria-label=\"Undo\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 7v6h6\"/><path d=\"M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13\"/></svg></button>",
-      "css": ".ds-icon-btn { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border:none; border-radius:6px; background:transparent; color:#1a1a1a; cursor:pointer; transition:background-color .1s; } .ds-icon-btn:hover { background:rgba(0,0,0,0.06); } .ds-icon-btn:active { background:rgba(0,0,0,0.1); } .ds-icon-btn:focus-visible { outline:2px solid #4f46c9; outline-offset:2px; } .ds-icon-btn[aria-pressed=\"true\"] { background:rgba(79,70,201,0.1); color:#4f46c9; }"
+      "css": ".ds-icon-btn { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border:none; border-radius:6px; background:transparent; color:#1a1a1a; cursor:pointer; transition:background-color .1s; } .ds-icon-btn:hover { background:rgba(0,0,0,0.06); } .ds-icon-btn:active { background:rgba(0,0,0,0.1); } .ds-icon-btn:focus-visible { outline:2px solid #344c3e; outline-offset:2px; } .ds-icon-btn[aria-pressed=\"true\"] { background:rgba(52,76,62,0.1); color:#344c3e; }"
     },
     {
       "name": "Tool Button",
@@ -167,23 +167,23 @@
       "refersTo": "tool-button",
       "description": "Taller vertical tool control: icon stacked over a monospace shortcut badge.",
       "html": "<button class=\"ds-tool-btn\" aria-label=\"Select tool\"><span class=\"ds-tool-icon\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z\"/></svg></span><span class=\"ds-tool-badge\">V</span></button>",
-      "css": ".ds-tool-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; width:40px; height:48px; border:none; border-radius:6px; background:transparent; color:#1a1a1a; cursor:pointer; transition:background-color .1s; } .ds-tool-btn:hover { background:rgba(0,0,0,0.06); } .ds-tool-btn:active { background:rgba(0,0,0,0.1); } .ds-tool-btn:focus-visible { outline:2px solid #4f46c9; outline-offset:2px; } .ds-tool-icon { display:flex; align-items:center; justify-content:center; height:20px; } .ds-tool-badge { font-size:11px; line-height:12px; color:#6b6b75; }"
+      "css": ".ds-tool-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; width:40px; height:48px; border:none; border-radius:6px; background:transparent; color:#1a1a1a; cursor:pointer; transition:background-color .1s; } .ds-tool-btn:hover { background:rgba(0,0,0,0.06); } .ds-tool-btn:active { background:rgba(0,0,0,0.1); } .ds-tool-btn:focus-visible { outline:2px solid #344c3e; outline-offset:2px; } .ds-tool-icon { display:flex; align-items:center; justify-content:center; height:20px; } .ds-tool-badge { font-size:11px; line-height:12px; color:#515654; }"
     },
     {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The one filled-indigo CTA — the export action. Used once per surface.",
+      "description": "The one filled-green CTA — the export action. Used once per surface.",
       "html": "<button class=\"ds-btn-primary\">Export</button>",
-      "css": ".ds-btn-primary { display:inline-flex; align-items:center; height:32px; padding:0 12px; border:none; border-radius:6px; background:#4f46c9; color:#fff; font-family:var(--font-sans); font-size:12px; font-weight:500; cursor:pointer; transition:background-color .1s; } .ds-btn-primary:hover { background:#443cb9; } .ds-btn-primary:active { background:#443cb9; opacity:.9; } .ds-btn-primary:focus-visible { outline:2px solid #4f46c9; outline-offset:2px; }"
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; height:32px; padding:0 12px; border:none; border-radius:6px; background:#344c3e; color:#fff; font-family:var(--font-sans); font-size:12px; font-weight:500; cursor:pointer; transition:background-color .1s; } .ds-btn-primary:hover { background:#2a3e32; } .ds-btn-primary:active { background:#2a3e32; opacity:.9; } .ds-btn-primary:focus-visible { outline:2px solid #344c3e; outline-offset:2px; }"
     },
     {
       "name": "Text Input",
       "kind": "input",
       "refersTo": "input",
-      "description": "Standard field: hairline border, focus shifts border to Clinical Indigo — no glow.",
+      "description": "Standard field: hairline border, focus shifts border to Ward Green — no glow.",
       "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Individual name\" />",
-      "css": ".ds-input { width:100%; padding:6px 8px; border:1px solid #e6e6ec; border-radius:6px; font-family:var(--font-sans); font-size:13px; background:#fff; color:#1a1a1a; outline:none; transition:border-color .15s; } .ds-input::placeholder { color:#6b6b75; } .ds-input:focus { border-color:#4f46c9; }"
+      "css": ".ds-input { width:100%; padding:6px 8px; border:1px solid #e2e5e3; border-radius:6px; font-family:var(--font-sans); font-size:13px; background:#fff; color:#1a1a1a; outline:none; transition:border-color .15s; } .ds-input::placeholder { color:#515654; } .ds-input:focus { border-color:#344c3e; }"
     },
     {
       "name": "Floating Island",
@@ -191,7 +191,7 @@
       "refersTo": "island",
       "description": "The signature container: surface + hairline border + soft lift, floating over the canvas.",
       "html": "<div class=\"ds-island\"><button class=\"ds-island-btn\" aria-label=\"Zoom out\">−</button><span class=\"ds-island-readout\">100%</span><button class=\"ds-island-btn\" aria-label=\"Zoom in\">+</button></div>",
-      "css": ".ds-island { display:inline-flex; align-items:center; gap:4px; padding:6px; background:#fff; border:1px solid #e6e6ec; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06); } .ds-island-btn { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border:none; border-radius:6px; background:transparent; color:#1a1a1a; font-size:16px; cursor:pointer; transition:background-color .1s; } .ds-island-btn:hover { background:rgba(0,0,0,0.06); } .ds-island-readout { font-size:12px; color:#6b6b75; min-width:48px; text-align:center; user-select:none; }"
+      "css": ".ds-island { display:inline-flex; align-items:center; gap:4px; padding:6px; background:#fff; border:1px solid #e2e5e3; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06); } .ds-island-btn { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border:none; border-radius:6px; background:transparent; color:#1a1a1a; font-size:16px; cursor:pointer; transition:background-color .1s; } .ds-island-btn:hover { background:rgba(0,0,0,0.06); } .ds-island-readout { font-size:12px; color:#515654; min-width:48px; text-align:center; user-select:none; }"
     },
     {
       "name": "Shortcut Chip",
@@ -199,15 +199,15 @@
       "refersTo": "mono",
       "description": "Monospace keyboard-shortcut hint chip, as used in the command palette.",
       "html": "<kbd class=\"ds-shortcut\">⌘K</kbd>",
-      "css": ".ds-shortcut { font-family:var(--font-mono, monospace); font-size:11px; color:#6b6b75; background:#f7f7f9; border:1px solid #e6e6ec; border-radius:4px; padding:1px 5px; white-space:nowrap; }"
+      "css": ".ds-shortcut { font-family:var(--font-mono, monospace); font-size:11px; color:#515654; background:#f9fafa; border:1px solid #e2e5e3; border-radius:4px; padding:1px 5px; white-space:nowrap; }"
     },
     {
       "name": "Radial Menu Option",
       "kind": "custom",
       "refersTo": "icon-button",
-      "description": "Signature circular add-relative button orbiting a symbol; hover fills indigo, active scales down.",
+      "description": "Signature circular add-relative button orbiting a symbol; hover fills green, active scales down.",
       "html": "<button class=\"ds-radial-option\">Child</button>",
-      "css": ".ds-radial-option { display:flex; align-items:center; justify-content:center; width:32px; height:32px; padding:2px; border:1px solid #e6e6ec; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.1); color:#1a1a1a; font-family:var(--font-sans); font-size:8px; font-weight:600; line-height:1; letter-spacing:-0.2px; text-align:center; cursor:pointer; transition:background-color .15s, border-color .15s, transform .15s; } .ds-radial-option:hover { background:#4f46c9; border-color:#4f46c9; color:#fff; transform:scale(1.1); } .ds-radial-option:active { transform:scale(0.95); }"
+      "css": ".ds-radial-option { display:flex; align-items:center; justify-content:center; width:32px; height:32px; padding:2px; border:1px solid #e2e5e3; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.1); color:#1a1a1a; font-family:var(--font-sans); font-size:8px; font-weight:600; line-height:1; letter-spacing:-0.2px; text-align:center; cursor:pointer; transition:background-color .15s, border-color .15s, transform .15s; } .ds-radial-option:hover { background:#344c3e; border-color:#344c3e; color:#fff; transform:scale(1.1); } .ds-radial-option:active { transform:scale(0.95); }"
     }
   ],
   "narrative": {
@@ -216,13 +216,13 @@
     "keyCharacteristics": [
       "Canvas-first: full-bleed drawing surface; chrome floats, never reflows the canvas.",
       "On-demand UI: controls appear where and when needed (radial menu on a symbol, panel on selection).",
-      "One accent, used rarely: Clinical Indigo marks selection, primary action, and active state — nothing decorative.",
+      "One accent, used rarely: Ward Green marks selection, primary action, and active state — nothing decorative.",
       "Standards-locked canvas: symbols stay dark-on-light in every theme; fill is semantic (filled = affected).",
       "Redundant encoding: colour is never the only channel — condition fills also carry a pattern.",
       "Comfort, not modes: Light / Warm / Dim re-tint the surface; there is no dark mode."
     ],
     "rules": [
-      { "name": "The One Accent Rule", "body": "Clinical Indigo appears on ≤10% of any screen and always means 'this is active / selected / the primary action.' If indigo is decorating something inert, it is wrong.", "section": "colors" },
+      { "name": "The One Accent Rule", "body": "Ward Green appears on ≤10% of any screen and always means 'this is active / selected / the primary action.' If indigo is decorating something inert, it is wrong.", "section": "colors" },
       { "name": "The Semantic Fill Rule", "body": "On the canvas, fill is meaning, not style. A filled symbol is affected; an open symbol is unaffected. Never invert to a dark theme. This is why there is no dark mode — only comfort themes that keep symbols dark-on-light.", "section": "colors" },
       { "name": "The Redundant-Colour Rule", "body": "Any colour that encodes clinical meaning must be paired with a second channel — a fill pattern (diagonalLines, dots, crosshatch, stripes) or a label — so a colour-blind reader loses nothing.", "section": "colors" },
       { "name": "The Size-and-Weight Rule", "body": "Hierarchy comes from size and weight within one sans, never a second UI typeface. The only additional family is Caveat, and only for on-canvas annotations.", "section": "typography" },
@@ -231,7 +231,7 @@
     ],
     "dos": [
       "Do keep the canvas full-bleed and let chrome float over it. The pedigree is the hero.",
-      "Do reserve Clinical Indigo (#4f46c9) for selection, the primary action, active state, and focus — the One Accent Rule.",
+      "Do reserve Ward Green (#344c3e) for selection, the primary action, active state, and focus — the One Accent Rule.",
       "Do pair every meaning-bearing colour with a second channel — a fill pattern or a label — so condition shading survives colour-blindness.",
       "Do keep symbols dark-on-light in every theme; comfort themes re-tint warmth and luminance only.",
       "Do use the radius (6/10/14px) and shadow tokens; give floating chrome the Island Lift shadow and nothing at rest.",
@@ -247,7 +247,7 @@
       "Don't introduce a dark mode or invert the canvas — it breaks the Semantic Fill Rule.",
       "Don't add a second UI typeface or use clamp()/fluid type. Caveat is for on-canvas annotations only.",
       "Don't use border-left/border-right > 1px as a coloured accent stripe, or background-clip:text gradient text.",
-      "Don't push muted text lighter than Ink Secondary (#6b6b75) for 'elegance' — it fails contrast on the near-white surfaces."
+      "Don't push muted text lighter than Ink Secondary (#515654) for 'elegance' — it fails contrast on the near-white surfaces."
     ]
   }
 }

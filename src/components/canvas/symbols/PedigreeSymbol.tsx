@@ -11,6 +11,7 @@ import {
   SYMBOL_COLOR,
   SYMBOL_FILL,
   SELECTION_COLOR,
+  LINK_SOURCE_COLOR,
 } from '../../../utils/constants';
 
 import {
@@ -242,7 +243,6 @@ function HoverHighlight({ isHovered }: { isHovered: boolean }) {
   );
 }
 
-const LINK_SOURCE_COLOR = '#2563eb'; // matches the dashed connect preview line
 const LINK_TARGET_COLOR = '#16a34a'; // green = valid drop target
 
 /**

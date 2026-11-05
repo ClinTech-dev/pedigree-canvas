@@ -13,7 +13,7 @@ import styles from './ConditionControls.module.css';
  * Shared, direct-manipulation pickers for the three visual attributes of a
  * condition — colour, symbol quarter, and fill pattern. Used by both the Legend
  * editor and the properties-panel add-condition form so the two speak one
- * vocabulary (no native `<select>`s). The accent (Clinical Indigo) marks the
+ * vocabulary (no native `<select>`s). The accent (Ward Green) marks the
  * selected option only, per the One Accent Rule.
  */
 
