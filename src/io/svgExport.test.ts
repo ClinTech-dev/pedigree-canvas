@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { buildPedigreeSvg } from './svgExport';
-import type { PedigreeDocument, Individual } from '../types/pedigree';
+import type { PedigreeDocument, Individual, LegendEntry } from '../types/pedigree';
+import { pickConditionDefaults } from '../utils/conditionDefaults';
 import {
   GenderIdentity,
   VitalStatus,
@@ -771,5 +772,30 @@ describe('pregnancy-loss triangle rendering', () => {
     const svg = buildPedigreeSvg(minimalDoc({ p }, {}, {}));
 
     expect(svg).toContain('>ECT</text>');
+  });
+});
+
+describe('svgExport legend with default-picked conditions (#174)', () => {
+  it('exports each default-picked legend entry as a visibly distinct swatch', () => {
+    const doc = makeFixture();
+    const entries: LegendEntry[] = [];
+    for (const name of ['Breast cancer', 'Ovarian cancer', 'Colon cancer']) {
+      entries.push({ id: name.replace(' ', '-'), name, ...pickConditionDefaults(entries) });
+    }
+    doc.legendConfig.entries = entries;
+    const svg = buildPedigreeSvg(doc, 'Defaults');
+
+    // Each entry's swatch: the quarter rect inside its own legend clip group.
+    const swatches = entries.map((e) => {
+      const match = svg.match(
+        new RegExp(
+          `clip-path="url\\(#legendclip-[a-z]+-${e.id}\\)"><rect x="([-\\d.]+)" y="([-\\d.]+)" width="[\\d.]+" height="[\\d.]+" fill="([^"]+)"`,
+        ),
+      );
+      expect(match, `legend swatch for ${e.name}`).not.toBeNull();
+      return match!.slice(1).join('|');
+    });
+    expect(new Set(swatches).size).toBe(entries.length);
+    expect(svg).toContain('>= Ovarian cancer</text>');
   });
 });

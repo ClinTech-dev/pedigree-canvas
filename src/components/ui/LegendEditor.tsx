@@ -3,6 +3,10 @@ import { useUIStore } from '../../stores/uiStore';
 import type { LegendEntry } from '../../types/pedigree';
 import { generateId } from '../../utils/idGenerator';
 import {
+  findIdenticalEntryGroups,
+  pickConditionDefaults,
+} from '../../utils/conditionDefaults';
+import {
   ConditionColorPicker,
   ConditionQuarterGrid,
   ConditionPatternPicker,
@@ -28,16 +32,20 @@ export function LegendEditor() {
 
   const handleAdd = () => {
     // Conditions may share a quarter (they are differentiated by colour /
-    // pattern), so there is no per-quarter cap. New conditions default to the
-    // top-right quarter; the user can move them afterwards.
+    // pattern), so there is no per-quarter cap. Each new condition starts in
+    // the next free quarter with a pattern not used yet (issue #174), so
+    // accepting the defaults never gives two lookalike conditions. Read the
+    // entries imperatively: this is a handler, not a render.
+    const entries = usePedigreeStore.getState().document.legendConfig.entries;
     addLegendEntry({
       id: generateId(),
-      quarter: 'topRight',
-      fillColor: '#1a1a1a',
-      fillPattern: 'solid',
+      ...pickConditionDefaults(entries),
       name: 'New Condition',
     });
   };
+
+  const identicalGroups = findIdenticalEntryGroups(legendConfig.entries);
+  const lookalikeIds = new Set(identicalGroups.flat().map((e) => e.id));
 
   return (
     <div className={styles.backdrop} onClick={closeModal}>
@@ -62,10 +70,29 @@ export function LegendEditor() {
             </p>
           )}
 
+          {identicalGroups.length > 0 && (
+            <div className={styles.lookalikeWarning} role="status">
+              <p className={styles.lookalikeTitle}>
+                {identicalGroups.length === 1
+                  ? 'Two conditions look the same'
+                  : 'Some conditions look the same'}
+              </p>
+              {identicalGroups.map((group) => (
+                <p key={group[0].id} className={styles.lookalikeText}>
+                  {formatNames(group.map((e) => e.name))} have the same quarter,
+                  colour and pattern, so they can&rsquo;t be told apart on the
+                  chart or in the key. Change the quarter, colour or pattern
+                  of one of them.
+                </p>
+              ))}
+            </div>
+          )}
+
           {legendConfig.entries.map((entry) => (
             <LegendEntryRow
               key={entry.id}
               entry={entry}
+              looksLikeAnother={lookalikeIds.has(entry.id)}
               onUpdate={(patch) => updateLegendEntry(entry.id, patch)}
               onRemove={() => removeLegendEntry(entry.id)}
             />
@@ -80,15 +107,36 @@ export function LegendEditor() {
   );
 }
 
+/** Join names as "A and B" / "A, B and C"; blank names read as "Unnamed". */
+function formatNames(names: string[]): string {
+  const shown = names.map((n) => n.trim() || 'Unnamed');
+  if (shown.length <= 1) return shown.join('');
+  return `${shown.slice(0, -1).join(', ')} and ${shown[shown.length - 1]}`;
+}
+
 interface LegendEntryRowProps {
   entry: LegendEntry;
+  /** True when another entry has the same quarter, colour and pattern. */
+  looksLikeAnother: boolean;
   onUpdate: (patch: Partial<LegendEntry>) => void;
   onRemove: () => void;
 }
 
-function LegendEntryRow({ entry, onUpdate, onRemove }: LegendEntryRowProps) {
+function LegendEntryRow({
+  entry,
+  looksLikeAnother,
+  onUpdate,
+  onRemove,
+}: LegendEntryRowProps) {
   return (
-    <div className={styles.entryRow}>
+    <div
+      className={
+        looksLikeAnother
+          ? `${styles.entryRow} ${styles.entryRowLookalike}`
+          : styles.entryRow
+      }
+      data-lookalike={looksLikeAnother || undefined}
+    >
       <div className={styles.entryFields}>
         <div className={styles.field}>
           <label className={styles.label}>Condition name</label>

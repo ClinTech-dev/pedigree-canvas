@@ -25,6 +25,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   symbol. Documents saved under the old `type: 'consanguinity'` enum migrate
   automatically on load to `{ type: 'partnership', consanguineous: true }`,
   preserving any degree-of-relationship annotation.
+- New conditions no longer all start the same (issue #174). Each new legend
+  entry, from the Legend editor or the properties panel's **+ Add Condition**,
+  defaults to the next unused quarter (top-right, top-left, bottom-left,
+  bottom-right, then the least-used) and a fill pattern no entry uses yet; it
+  stays black until all six patterns are taken, then picks a colour not yet
+  paired with the reused pattern. The Legend editor shows a non-blocking warning
+  when two entries share quarter, colour and pattern, and the inline form warns
+  if its choice copies an existing entry. Saved documents load unchanged.
 
 ### Added
 - Individual-level childlessness: a person can be marked infertile or childless
