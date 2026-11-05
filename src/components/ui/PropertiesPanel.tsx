@@ -14,6 +14,12 @@ import { MultiSelectProperties } from './MultiSelectProperties';
 import { TwinZygosityFields } from './TwinZygosityFields';
 import { ConditionColorPicker, ConditionQuarterGrid, ConditionPatternPicker } from './ConditionControls';
 import { generateId } from '../../utils/idGenerator';
+import {
+  ageInputValue,
+  parseAgeInput,
+  withOnset,
+  withoutOnset,
+} from '../../utils/symbolLabelLines';
 import { collectInvestigations } from '../../utils/investigations';
 import {
   detectQuarterClashes,
@@ -150,6 +156,10 @@ export function PropertiesPanel() {
   const [conditionPattern, setConditionPattern] = useState<FillPatternType>(
     PATTERN_OPTIONS[0].value,
   );
+  const [conditionOnset, setConditionOnset] = useState('');
+  // The condition most recently ticked on, so its age-at-onset box takes focus
+  // and the onset can be typed in the same step (issue #170).
+  const [justAssignedId, setJustAssignedId] = useState<string | null>(null);
 
   const resetConditionForm = useCallback(() => {
     setAddingCondition(false);
@@ -157,6 +167,7 @@ export function PropertiesPanel() {
     setConditionColor(COLOR_OPTIONS[0].value);
     setConditionQuarter(QUARTER_OPTIONS[0].value);
     setConditionPattern(PATTERN_OPTIONS[0].value);
+    setConditionOnset('');
   }, []);
 
   const submitCondition = useCallback(() => {
@@ -170,9 +181,16 @@ export function PropertiesPanel() {
       conditionPattern,
     );
     addLegendEntry(entry);
-    // Immediately apply the new condition to the selected individual.
+    // Immediately apply the new condition to the selected individual, with its
+    // age at onset when one was given (issue #170).
     const current = individual.conditionIds ?? [];
-    update({ conditionIds: [...current, entry.id] });
+    const onset = parseAgeInput(conditionOnset);
+    update({
+      conditionIds: [...current, entry.id],
+      ...(onset !== undefined && {
+        conditionOnsets: withOnset(individual.conditionOnsets, entry.id, onset),
+      }),
+    });
     resetConditionForm();
   }, [
     individual,
@@ -180,6 +198,7 @@ export function PropertiesPanel() {
     conditionColor,
     conditionQuarter,
     conditionPattern,
+    conditionOnset,
     addLegendEntry,
     update,
     resetConditionForm,
@@ -201,8 +220,7 @@ export function PropertiesPanel() {
     if (!individual) return;
     const name = noteName.trim();
     if (!name) return;
-    const parsedAge = noteAge.trim() ? parseInt(noteAge, 10) : NaN;
-    const ageOfOnset = !isNaN(parsedAge) ? parsedAge : undefined;
+    const ageOfOnset = parseAgeInput(noteAge);
     update({
       conditions: [
         ...individual.conditions,
@@ -274,10 +292,25 @@ export function PropertiesPanel() {
 
   const toggleCondition = (entryId: string) => {
     const current = individual.conditionIds ?? [];
-    const next = current.includes(entryId)
-      ? current.filter((id) => id !== entryId)
-      : [...current, entryId];
-    update({ conditionIds: next });
+    if (current.includes(entryId)) {
+      // Unassigning also drops the age at onset, so it can't resurface later.
+      update({
+        conditionIds: current.filter((id) => id !== entryId),
+        ...(individual.conditionOnsets && {
+          conditionOnsets: withoutOnset(individual.conditionOnsets, entryId),
+        }),
+      });
+      setJustAssignedId(null);
+    } else {
+      update({ conditionIds: [...current, entryId] });
+      setJustAssignedId(entryId);
+    }
+  };
+
+  const setConditionOnsetFor = (entryId: string, raw: string) => {
+    update({
+      conditionOnsets: withOnset(individual.conditionOnsets, entryId, parseAgeInput(raw)),
+    });
   };
 
   const applicableEntries = legendConfig.entries.filter((entry) => {
@@ -368,22 +401,43 @@ export function PropertiesPanel() {
               : 'No conditions apply to this individual.'}
           </p>
         ) : (
-          applicableEntries.map((entry) => (
-            <div key={entry.id} className={styles.field}>
-              <label className={styles.checkbox}>
-                <input
-                  type="checkbox"
-                  checked={(individual.conditionIds ?? []).includes(entry.id)}
-                  onChange={() => toggleCondition(entry.id)}
-                />
-                <span
-                  className={styles.conditionSwatch}
-                  style={{ backgroundColor: entry.fillColor }}
-                />
-                {entry.name}
-              </label>
-            </div>
-          ))
+          applicableEntries.map((entry) => {
+            const assigned = appliedConditionIds.includes(entry.id);
+            return (
+              <div key={entry.id} className={styles.field}>
+                <div className={styles.conditionRow}>
+                  <label className={styles.checkbox}>
+                    <input
+                      type="checkbox"
+                      checked={assigned}
+                      onChange={() => toggleCondition(entry.id)}
+                    />
+                    <span
+                      className={styles.conditionSwatch}
+                      style={{ backgroundColor: entry.fillColor }}
+                    />
+                    {entry.name}
+                  </label>
+                  {assigned && (
+                    <input
+                      className={`${styles.input} ${styles.onsetInput}`}
+                      value={ageInputValue(individual.conditionOnsets?.[entry.id])}
+                      onChange={(e) => setConditionOnsetFor(entry.id, e.target.value)}
+                      placeholder="dx age"
+                      aria-label={`Age at onset for ${entry.name}`}
+                      title="Age at onset / diagnosis (optional), e.g. 39, 40s, ~65, ?"
+                      autoFocus={justAssignedId === entry.id}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })
+        )}
+        {appliedConditionIds.length > 0 && (
+          <p className={styles.hint}>
+            An age at onset is drawn under the symbol as “Name (dx 39)”.
+          </p>
         )}
 
         {addingCondition ? (
@@ -413,6 +467,22 @@ export function PropertiesPanel() {
                 value={conditionPattern}
                 color={conditionColor}
                 onChange={setConditionPattern}
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="new-condition-onset">
+                Age at onset (optional)
+              </label>
+              <input
+                id="new-condition-onset"
+                className={styles.input}
+                value={conditionOnset}
+                onChange={(e) => setConditionOnset(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') submitCondition();
+                  if (e.key === 'Escape') resetConditionForm();
+                }}
+                placeholder="e.g. 39, 40s, ~65, ?"
               />
             </div>
             <div className={styles.noteFormActions}>
@@ -588,15 +658,13 @@ export function PropertiesPanel() {
               />
               <input
                 className={styles.input}
-                type="number"
                 value={noteAge}
                 onChange={(e) => setNoteAge(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') submitNote();
                   if (e.key === 'Escape') resetNoteForm();
                 }}
-                placeholder="Age of onset (optional)"
-                min={0}
+                placeholder="Age of onset (optional), e.g. 39, 40s"
               />
               <div className={styles.noteFormActions}>
                 <button
@@ -654,21 +722,19 @@ export function PropertiesPanel() {
 
         {individual.vitalStatus !== VitalStatus.Stillborn && (
           <div className={styles.field}>
-            <label className={styles.label}>Age</label>
+            <label className={styles.label} htmlFor="individual-age">
+              {individual.vitalStatus === VitalStatus.Deceased ? 'Age at death' : 'Age'}
+            </label>
             <input
+              id="individual-age"
               className={styles.input}
-              type="number"
-              value={individual.age ?? ''}
-              onChange={(e) =>
-                update({
-                  age: e.target.value
-                    ? parseInt(e.target.value, 10)
-                    : undefined,
-                })
-              }
-              placeholder="Age"
-              min={0}
+              value={ageInputValue(individual.age)}
+              onChange={(e) => update({ age: parseAgeInput(e.target.value) })}
+              placeholder="e.g. 45, 60s, ~65, ?"
             />
+            <p className={styles.hint}>
+              Approximate ages are drawn as typed (e.g. “d. 60s”).
+            </p>
           </div>
         )}
 
@@ -685,6 +751,16 @@ export function PropertiesPanel() {
               }
               placeholder="Cause of death"
             />
+            <label className={styles.checkbox} style={{ marginTop: 6 }}>
+              <input
+                type="checkbox"
+                checked={individual.causeOfDeathUncertain ?? false}
+                onChange={(e) =>
+                  update({ causeOfDeathUncertain: e.target.checked || undefined })
+                }
+              />
+              Uncertain (drawn with “?”)
+            </label>
           </div>
         )}
 

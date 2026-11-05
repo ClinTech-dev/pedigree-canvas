@@ -26,6 +26,7 @@ import {
 import { reformatLayout } from '../utils/reformatLayout';
 import { commonSibshipId } from '../utils/sibship';
 import { twinGroupsTouching, pickSurvivingTwinGroup } from '../utils/twinGrouping';
+import { withoutOnset } from '../utils/symbolLabelLines';
 
 /**
  * Apply id -> {x,y} position changes immutably; untouched individuals are kept.
@@ -388,6 +389,10 @@ export const usePedigreeStore = create<PedigreeState>()(
               individuals[id] = {
                 ...existing,
                 conditionIds: current.filter((c) => c !== entryId),
+                // Unassigning a condition drops its age at onset too (#170).
+                ...(existing.conditionOnsets && {
+                  conditionOnsets: withoutOnset(existing.conditionOnsets, entryId),
+                }),
               };
               changed = true;
             }
@@ -1282,6 +1287,9 @@ export const usePedigreeStore = create<PedigreeState>()(
             updatedIndividuals[iId] = {
               ...ind,
               conditionIds: ind.conditionIds.filter((cId) => cId !== id),
+              ...(ind.conditionOnsets && {
+                conditionOnsets: withoutOnset(ind.conditionOnsets, id),
+              }),
             };
           }
 

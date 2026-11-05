@@ -195,6 +195,12 @@ Standard annotations below (or beside) the individual's symbol:
 
 App: `displayName`, `age`, `dateOfBirth`, `causeOfDeath`, `investigations[]`, `annotations[]`, `notes`.
 
+App label conventions (one shared formatter, `src/utils/symbolLabelLines.ts`, drives both the canvas and the SVG/PDF export):
+
+- **Approximate ages** (#166): `age` (and ages at onset) accept the value as the family gave it — `60s`, `~65`, `?`, `6 mo` — and draw it verbatim (`d. 60s`). Whole numbers are still stored and drawn as numbers, so older charts are unchanged.
+- **Cause of death** (#166): drawn on its own line directly under `d. <age>` for a deceased individual. Marking it uncertain prefixes `?` (`?stomach cancer`), following the `?` convention for an uncertain diagnosis above.
+- **Condition with age at onset** (#170): a legend condition assigned with an age at onset draws `<legend name> (dx <age>)`, e.g. `Breast cancer (dx 39)` — the same form as clinical notes. A condition assigned without an age draws no text (shading + key only, as before).
+
 ---
 
 ## 12. Layout Conventions

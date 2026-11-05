@@ -102,6 +102,44 @@ function makeDocument(): PedigreeDocument {
   };
 }
 
+describe('approximate ages, cause of death and condition onsets (#166, #170)', () => {
+  it('loads a legacy numeric age unchanged', () => {
+    const doc = createDefaultDocument();
+    const individual = createDefaultIndividual({ age: 52, causeOfDeath: 'MI' });
+    doc.individuals[individual.id] = individual;
+    const parsed = JSON.parse(serializeDocument(doc));
+    // A document saved before these fields existed.
+    delete parsed.document.individuals[individual.id].causeOfDeathUncertain;
+    delete parsed.document.individuals[individual.id].conditionOnsets;
+
+    const loaded = deserializeDocument(JSON.stringify(parsed)).individuals[individual.id];
+    expect(loaded.age).toBe(52);
+    expect(typeof loaded.age).toBe('number');
+    expect(loaded.causeOfDeath).toBe('MI');
+    expect(loaded.causeOfDeathUncertain).toBeUndefined();
+    expect(loaded.conditionOnsets).toBeUndefined();
+  });
+
+  it('round-trips approximate ages, uncertain cause and onsets', () => {
+    const doc = createDefaultDocument();
+    const individual = createDefaultIndividual({
+      age: '60s',
+      causeOfDeath: 'stomach cancer',
+      causeOfDeathUncertain: true,
+      conditionIds: ['brca'],
+      conditionOnsets: { brca: 39 },
+      conditions: [{ id: 'n', name: 'Migraine', ageOfOnset: '~30' }],
+    });
+    doc.individuals[individual.id] = individual;
+
+    const loaded = deserializeDocument(serializeDocument(doc)).individuals[individual.id];
+    expect(loaded.age).toBe('60s');
+    expect(loaded.causeOfDeathUncertain).toBe(true);
+    expect(loaded.conditionOnsets).toEqual({ brca: 39 });
+    expect(loaded.conditions[0].ageOfOnset).toBe('~30');
+  });
+});
+
 describe('jsonIO text annotation round-trip', () => {
   it('preserves text annotations through serialize -> deserialize', () => {
     const doc = makeDocument();

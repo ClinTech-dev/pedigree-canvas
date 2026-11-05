@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import { Group, Rect, Circle } from 'react-konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import type { Individual } from '../../../types/pedigree';
+import type { Individual, LegendEntry } from '../../../types/pedigree';
 import { GenderIdentity, VitalStatus } from '../../../types/enums';
 import { useUIStore } from '../../../stores/uiStore';
 import { useViewportStore } from '../../../stores/viewportStore';
@@ -70,6 +70,8 @@ export interface PedigreeSymbolProps {
    * clears the marks. Computed by the parent, which has the partnerships.
    */
   childlessActive?: boolean;
+  /** Legend entries, forwarded to {@link SymbolLabel} for "dx <age>" lines. */
+  legendEntries?: readonly LegendEntry[];
 }
 
 const SELECTION_STROKE_WIDTH = 2;
@@ -303,6 +305,7 @@ export const PedigreeSymbol: React.FC<PedigreeSymbolProps> = React.memo(
     isLinkTarget = false,
     symbolFill = SYMBOL_FILL,
     childlessActive = false,
+    legendEntries,
   }) => {
     // Position of the symbol when a drag began. Captured so the whole drag can
     // be committed as a single undo step on drag end (see handleDragEnd).
@@ -561,6 +564,7 @@ export const PedigreeSymbol: React.FC<PedigreeSymbolProps> = React.memo(
           individual={individual}
           individualNumber={individualNumber}
           childlessActive={childlessActive}
+          legendEntries={legendEntries}
         />
       </Group>
     );

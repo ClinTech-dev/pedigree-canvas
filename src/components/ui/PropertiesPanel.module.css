@@ -342,3 +342,24 @@
 .noteCancelButton:hover {
   text-decoration: underline;
 }
+
+/* A condition checkbox with its optional age-at-onset box on the same line
+   (issue #170). */
+.conditionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.conditionRow .checkbox {
+  flex: 1;
+  min-width: 0;
+}
+
+.onsetInput {
+  width: 72px;
+  flex-shrink: 0;
+  padding: 3px 6px;
+  font-size: 12px;
+}
