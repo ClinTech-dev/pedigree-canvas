@@ -13,6 +13,7 @@ import type {
 import { GenderIdentity, RelationshipType, TwinType, VitalStatus } from '../types/enums';
 import { computeBounds, computeGenerationNumerals } from '../utils/boundsCalculation';
 import { collectInvestigations, formatInvestigation } from '../utils/investigations';
+import { buildSymbolLabelLines } from '../utils/symbolLabelLines';
 import {
   SYMBOL_SIZE,
   SYMBOL_STROKE_WIDTH,
@@ -313,71 +314,6 @@ function computeIndividualNumbers(individuals: Individual[]): Map<string, number
 // ---------------------------------------------------------------------------
 
 /**
- * Build the centred name/age/condition label lines for an individual, matching
- * `SymbolLabel.tsx`. The individual number is rendered separately at the
- * symbol's bottom-right corner and is therefore not included here.
- *
- * When `childlessActive` the childless cause is folded in as the first line
- * (directly under the cross-bars), mirroring the Konva label; the marks
- * themselves are drawn by {@link renderIndividualChildlessLine}.
- */
-function buildLabelLines(individual: Individual, childlessActive = false): string[] {
-  const lines: string[] = [];
-
-  const childlessReason = individual.childlessReason?.trim();
-  if (childlessActive && childlessReason) {
-    lines.push(childlessReason);
-  }
-
-  if (individual.displayName) {
-    lines.push(individual.displayName);
-  }
-  if (individual.age != null) {
-    if (
-      individual.vitalStatus === VitalStatus.Deceased ||
-      individual.vitalStatus === VitalStatus.Stillborn
-    ) {
-      lines.push(`d. ${individual.age}`);
-    } else {
-      lines.push(`${individual.age}`);
-    }
-  }
-  // Stillbirth: "SB" + gestational age (mirrors SymbolLabel.tsx). GA is gated on
-  // a stillbirth or ongoing pregnancy so a stale value never shows otherwise.
-  if (individual.vitalStatus === VitalStatus.Stillborn) {
-    lines.push('SB');
-  }
-  // Pregnancy not carried to term: annotate the triangle with the outcome
-  // abbreviation (SAB / TOP / ECT), mirroring SymbolLabel.tsx.
-  if (individual.isPregnancy && individual.pregnancyOutcome) {
-    lines.push(individual.pregnancyOutcome);
-  }
-  if (
-    (individual.vitalStatus === VitalStatus.Stillborn || individual.isPregnancy) &&
-    individual.gestationalAge?.trim()
-  ) {
-    lines.push(`GA: ${individual.gestationalAge.trim()}`);
-  }
-  if (individual.sexAssignedAtBirth) {
-    lines.push(individual.sexAssignedAtBirth);
-  }
-  for (const condition of individual.conditions) {
-    if (condition.ageOfOnset != null) {
-      lines.push(`${condition.name} (dx ${condition.ageOfOnset})`);
-    } else {
-      lines.push(condition.name);
-    }
-  }
-
-  for (const investigation of individual.investigations) {
-    const value = investigation.label.trim();
-    if (value) lines.push(value);
-  }
-
-  return lines;
-}
-
-/**
  * Render a single individual (symbol + shading + slash + arrow + labels) as a
  * positioned SVG group.
  */
@@ -485,7 +421,7 @@ function renderIndividual(
 
   // Text labels (centred under the symbol). Pushed below the childless marks
   // when they are drawn so name / investigations / cause clear the cross-bars.
-  const lines = buildLabelLines(individual, childlessActive);
+  const lines = buildSymbolLabelLines(individual, entries, childlessActive);
   if (lines.length > 0) {
     const startY =
       SYMBOL_SIZE / 2 + LABEL_OFFSET_Y + (childlessActive ? CHILDLESS_LABEL_OFFSET : 0);
@@ -633,7 +569,7 @@ function renderPartnershipLine(
  * Render an individual's childless marks (no-partner analogue of a childless
  * union), matching `IndividualChildlessLine.tsx`. Suppressed once the individual
  * has children on the canvas. The cause text is folded into the label stack (see
- * {@link buildLabelLines}), not drawn here.
+ * {@link buildSymbolLabelLines}), not drawn here.
  */
 function renderIndividualChildlessLine(
   individual: Individual,
@@ -1094,7 +1030,7 @@ export function buildPedigreeSvg(doc: PedigreeDocument, title = ''): string {
     const childlessActive = childlessMarksActive(ind, doc.partnerships);
     // Label lines extend below the symbol — pushed down past the childless marks
     // when those are drawn (the cause is folded in as the first line).
-    const lines = buildLabelLines(ind, childlessActive);
+    const lines = buildSymbolLabelLines(ind, entries, childlessActive);
     if (lines.length > 0) {
       const labelBottom =
         ind.position.y +

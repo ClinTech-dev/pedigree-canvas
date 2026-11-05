@@ -652,6 +652,7 @@ export const CanvasContainer = forwardRef<CanvasContainerHandle>(
                   }
                   symbolFill={canvasPalette.symbolFill}
                   childlessActive={childlessMarksActive(individual, partnerships)}
+                  legendEntries={legendConfig?.entries}
                 />
               ))}
             </Layer>

@@ -1723,6 +1723,43 @@ describe('setConditionForIndividuals (bulk)', () => {
     expect(doc.individuals.b.conditionIds).toEqual([]);
   });
 
+  it('drops the age at onset of a condition it removes (#170)', () => {
+    const store = usePedigreeStore.getState();
+    store.addIndividual(
+      createDefaultIndividual({
+        id: 'a',
+        conditionIds: ['x', 'y'],
+        conditionOnsets: { x: 39, y: '40s' },
+      }),
+    );
+
+    store.setConditionForIndividuals(['a'], 'x', false);
+
+    const ind = usePedigreeStore.getState().document.individuals.a;
+    expect(ind.conditionIds).toEqual(['y']);
+    expect(ind.conditionOnsets).toEqual({ y: '40s' });
+  });
+
+  it('drops ages at onset when the legend entry is deleted (#170)', () => {
+    const store = usePedigreeStore.getState();
+    store.addLegendEntry({
+      id: 'x',
+      name: 'Breast cancer',
+      quarter: 'topRight',
+      fillColor: '#000000',
+      fillPattern: 'solid',
+    });
+    store.addIndividual(
+      createDefaultIndividual({ id: 'a', conditionIds: ['x'], conditionOnsets: { x: 39 } }),
+    );
+
+    store.removeLegendEntry('x');
+
+    const ind = usePedigreeStore.getState().document.individuals.a;
+    expect(ind.conditionIds).toEqual([]);
+    expect(ind.conditionOnsets).toBeUndefined();
+  });
+
   it('records a single undoable step', () => {
     const store = usePedigreeStore.getState();
     store.addIndividual(createDefaultIndividual({ id: 'a', conditionIds: [] }));

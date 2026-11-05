@@ -4,7 +4,7 @@ import {
   createDefaultDocument,
   createDefaultIndividual,
 } from '../stores/pedigreeStore';
-import { RelationshipType, TwinType } from '../types/enums';
+import { RelationshipType, TwinType, VitalStatus } from '../types/enums';
 import type { PedigreeDocument } from '../types/pedigree';
 import {
   DASH_PATTERN,
@@ -272,5 +272,51 @@ describe('SVG export — twin notation', () => {
   it('does not render a "?" for monozygotic or dizygotic twins', () => {
     expect(withTwins(TwinType.Monozygotic)).not.toContain('>?</text>');
     expect(withTwins(TwinType.Dizygotic)).not.toContain('>?</text>');
+  });
+});
+
+describe('svgExport sub-symbol annotations (issues #166, #170)', () => {
+  const breast = {
+    id: 'brca',
+    name: 'Breast cancer',
+    quarter: 'topRight' as const,
+    fillColor: '#000000',
+    fillPattern: 'solid' as const,
+  };
+
+  it('draws an approximate age at death, the cause of death and "?" when uncertain', () => {
+    const doc = makeFamily();
+    doc.individuals.dad.vitalStatus = VitalStatus.Deceased;
+    doc.individuals.dad.age = '60s';
+    doc.individuals.dad.causeOfDeath = 'stomach cancer';
+    doc.individuals.dad.causeOfDeathUncertain = true;
+    const svg = buildPedigreeSvg(doc, 'T');
+    expect(svg).toContain('>d. 60s</text>');
+    expect(svg).toContain('>?stomach cancer</text>');
+  });
+
+  it('still draws a legacy numeric age at death as "d. 52"', () => {
+    const doc = makeFamily();
+    doc.individuals.dad.vitalStatus = VitalStatus.Deceased;
+    doc.individuals.dad.age = 52;
+    expect(buildPedigreeSvg(doc, 'T')).toContain('>d. 52</text>');
+  });
+
+  it('draws a legend condition with its age at onset under the symbol', () => {
+    const doc = makeFamily();
+    doc.legendConfig.entries = [breast];
+    doc.individuals.mum.conditionIds = ['brca'];
+    doc.individuals.mum.conditionOnsets = { brca: 39 };
+    const svg = buildPedigreeSvg(doc, 'T');
+    expect(svg).toContain('>Breast cancer (dx 39)</text>');
+    // The key still lists the condition once.
+    expect(svg).toContain('>= Breast cancer</text>');
+  });
+
+  it('draws no onset line for a condition assigned without an age', () => {
+    const doc = makeFamily();
+    doc.legendConfig.entries = [breast];
+    doc.individuals.mum.conditionIds = ['brca'];
+    expect(buildPedigreeSvg(doc, 'T')).not.toContain('(dx');
   });
 });

@@ -40,10 +40,21 @@ export interface Position {
   y: number;
 }
 
+/**
+ * An age as the family reported it. A whole number of years is stored as a
+ * `number` (every document saved before approximate ages were allowed uses this
+ * form, and it still loads and draws unchanged). Anything else the user typed
+ * — an approximate or unknown age such as `"60s"`, `"~65"`, `"?"` or `"6 mo"` —
+ * is stored as the text they entered and drawn as entered, so the chart never
+ * states a precision the family did not give (issue #166). Parse user input
+ * with `parseAgeInput` and draw it with `formatAge` (`utils/symbolLabelLines`).
+ */
+export type AgeValue = number | string;
+
 export interface Condition {
   id: string;
   name: string;
-  ageOfOnset?: number;
+  ageOfOnset?: AgeValue;
   ageOfDiagnosis?: number;
 }
 
@@ -99,12 +110,32 @@ export interface Individual {
   // Display
   displayName?: string;
   dateOfBirth?: string;
-  age?: number;
+  /**
+   * Current age, or age at death when deceased (drawn `d. <age>`). May be an
+   * approximate value such as `"60s"` — see {@link AgeValue}.
+   */
+  age?: AgeValue;
 
   // Clinical
   vitalStatus: VitalStatus;
   causeOfDeath?: string;
+  /**
+   * True when the cause of death is uncertain (e.g. the family reports
+   * "stomach trouble?"). The cause is then drawn with a leading `?`, per the
+   * Bennett/NSGC use of `?` for an uncertain diagnosis (issue #166).
+   */
+  causeOfDeathUncertain?: boolean;
+  /** Ids of the legend conditions (shading + key) this individual has. */
   conditionIds: string[];
+  /**
+   * Optional age at onset/diagnosis for each assigned legend condition, keyed by
+   * the {@link LegendEntry} id in {@link conditionIds}. When present the symbol
+   * is annotated `<condition name> (dx <age>)` (issue #170). Entries for
+   * conditions no longer assigned are ignored and pruned when the condition is
+   * removed.
+   */
+  conditionOnsets?: Record<string, AgeValue>;
+  /** Free-text clinical notes (drawn under the symbol), with optional onset. */
   conditions: Condition[];
 
   // Pedigree role

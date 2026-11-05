@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Group, Text } from 'react-konva';
-import type { Individual } from '../../../types/pedigree';
-import { VitalStatus } from '../../../types/enums';
+import type { Individual, LegendEntry } from '../../../types/pedigree';
+import { buildSymbolLabelLines } from '../../../utils/symbolLabelLines';
 import {
   SYMBOL_SIZE,
   LABEL_FONT_SIZE,
@@ -23,7 +23,15 @@ export interface SymbolLabelProps {
    * suppressed by children — see {@link childlessMarksActive}.
    */
   childlessActive?: boolean;
+  /**
+   * The document's legend entries, so a condition assigned with an age at
+   * onset can be drawn as `"<name> (dx <age>)"`. Passed down from
+   * `CanvasContainer` (subscriptions can't live inside react-konva).
+   */
+  legendEntries?: readonly LegendEntry[];
 }
+
+const NO_ENTRIES: readonly LegendEntry[] = [];
 
 const LINE_HEIGHT = LABEL_FONT_SIZE + 4;
 
@@ -47,78 +55,12 @@ function numberCornerX(adopted: boolean): number {
 }
 
 export const SymbolLabel: React.FC<SymbolLabelProps> = React.memo(
-  ({ individual, individualNumber, childlessActive = false }) => {
-    const lines = useMemo(() => {
-      const result: string[] = [];
-
-      // Childless cause (e.g. "vasectomy") sits first, directly under the
-      // cross-bar(s), when the childless marks are drawn — mirrors the partnership
-      // marker, which prints the cause below its bars.
-      const childlessReason = individual.childlessReason?.trim();
-      if (childlessActive && childlessReason) {
-        result.push(childlessReason);
-      }
-
-      // Display name
-      if (individual.displayName) {
-        result.push(individual.displayName);
-      }
-
-      // Age (or "d. [age]" if deceased)
-      if (individual.age != null) {
-        if (
-          individual.vitalStatus === VitalStatus.Deceased ||
-          individual.vitalStatus === VitalStatus.Stillborn
-        ) {
-          result.push(`d. ${individual.age}`);
-        } else {
-          result.push(`${individual.age}`);
-        }
-      }
-
-      // Stillbirth: "SB" abbreviation plus gestational age, per NSGC/Bennett
-      // (the symbol stays the sex-specific shape with a deceased slash — a
-      // stillbirth is never a triangle). Gestational age is only meaningful for
-      // a stillbirth or an ongoing pregnancy, so it is gated on those rather
-      // than shown for any individual that happens to carry a stale value.
-      if (individual.vitalStatus === VitalStatus.Stillborn) {
-        result.push('SB');
-      }
-      // Pregnancy not carried to term: annotate the triangle with the outcome
-      // abbreviation (SAB / TOP / ECT) so the three losses are distinguishable.
-      if (individual.isPregnancy && individual.pregnancyOutcome) {
-        result.push(individual.pregnancyOutcome);
-      }
-      if (
-        (individual.vitalStatus === VitalStatus.Stillborn || individual.isPregnancy) &&
-        individual.gestationalAge?.trim()
-      ) {
-        result.push(`GA: ${individual.gestationalAge.trim()}`);
-      }
-
-      // Sex assigned at birth annotation (AMAB / AFAB)
-      if (individual.sexAssignedAtBirth) {
-        result.push(individual.sexAssignedAtBirth);
-      }
-
-      // Subsequent lines: conditions with age of onset
-      for (const condition of individual.conditions) {
-        if (condition.ageOfOnset != null) {
-          result.push(`${condition.name} (dx ${condition.ageOfOnset})`);
-        } else {
-          result.push(condition.name);
-        }
-      }
-
-      // Investigations (genetic tests etc.) — the short label only; the
-      // free-text description is surfaced in the key and properties panel.
-      for (const investigation of individual.investigations) {
-        const value = investigation.label.trim();
-        if (value) result.push(value);
-      }
-
-      return result;
-    }, [individual, childlessActive]);
+  ({ individual, individualNumber, childlessActive = false, legendEntries = NO_ENTRIES }) => {
+    // Shared with svgExport.ts so canvas and vector export never drift.
+    const lines = useMemo(
+      () => buildSymbolLabelLines(individual, legendEntries, childlessActive),
+      [individual, legendEntries, childlessActive],
+    );
 
     if (lines.length === 0 && individualNumber == null) {
       return null;

@@ -191,7 +191,7 @@ describe('PropertiesPanel stillbirth gestational age', () => {
     render(<PropertiesPanel />);
     // Gestational age is shown; the Age input is not (GA takes its place).
     expect(screen.getByDisplayValue('20 wk')).toBeInTheDocument();
-    expect(screen.queryByPlaceholderText('Age')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Age')).not.toBeInTheDocument();
   });
 
   it('clears a stale age when the status changes to Stillborn', () => {
@@ -211,13 +211,13 @@ describe('PropertiesPanel stillbirth gestational age', () => {
 
     render(<PropertiesPanel />);
     // Age is shown for a living person…
-    expect(screen.getByPlaceholderText('Age')).toBeInTheDocument();
+    expect(screen.getByLabelText('Age')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Stillborn' }));
 
     // …and dropped on the switch to Stillborn, so no "d. <age>" can render.
     expect(usePedigreeStore.getState().document.individuals['p-1'].age).toBeUndefined();
-    expect(screen.queryByPlaceholderText('Age')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Age')).not.toBeInTheDocument();
     expect(screen.getByPlaceholderText('e.g. 20 wk')).toBeInTheDocument();
   });
 });

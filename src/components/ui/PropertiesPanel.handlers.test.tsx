@@ -117,6 +117,57 @@ describe('PropertiesPanel condition handlers', () => {
     expect(current().conditionIds).not.toContain('cond-1');
   });
 
+  it('offers an age at onset as soon as a condition is ticked, and stores it (#170)', () => {
+    seedIndividual({}, [entry]);
+    render(<PropertiesPanel />);
+
+    // No onset box until the condition is assigned.
+    expect(screen.queryByLabelText('Age at onset for Cancer')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('checkbox', { name: /Cancer/ }));
+
+    const onset = screen.getByLabelText('Age at onset for Cancer');
+    // Focused straight away so the age goes in the same step.
+    expect(onset).toHaveFocus();
+    fireEvent.change(onset, { target: { value: '39' } });
+    expect(current().conditionOnsets).toEqual({ 'cond-1': 39 });
+
+    fireEvent.change(onset, { target: { value: '40s' } });
+    expect(current().conditionOnsets).toEqual({ 'cond-1': '40s' });
+
+    fireEvent.change(onset, { target: { value: '' } });
+    expect(current().conditionOnsets).toBeUndefined();
+  });
+
+  it('drops the age at onset when the condition is unticked', () => {
+    seedIndividual({ conditionIds: ['cond-1'], conditionOnsets: { 'cond-1': 39 } }, [entry]);
+    render(<PropertiesPanel />);
+
+    expect(screen.getByLabelText('Age at onset for Cancer')).toHaveValue('39');
+    fireEvent.click(screen.getByRole('checkbox', { name: /Cancer/ }));
+    expect(current().conditionIds).not.toContain('cond-1');
+    expect(current().conditionOnsets).toBeUndefined();
+  });
+
+  it('creates a new condition with an age at onset in one step (#170)', () => {
+    seedIndividual();
+    render(<PropertiesPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: '+ Add Condition' }));
+    const nameInput = screen.getByPlaceholderText('Condition name');
+    fireEvent.change(nameInput, { target: { value: 'Breast cancer' } });
+    fireEvent.change(screen.getByLabelText('Age at onset (optional)'), {
+      target: { value: '39' },
+    });
+    clickAddNear(nameInput);
+
+    const added = usePedigreeStore
+      .getState()
+      .document.legendConfig.entries.find((e) => e.name === 'Breast cancer');
+    expect(added).toBeDefined();
+    expect(current().conditionIds).toContain(added!.id);
+    expect(current().conditionOnsets).toEqual({ [added!.id]: 39 });
+  });
+
   it('creates a new condition inline and applies it to the individual', () => {
     seedIndividual();
     render(<PropertiesPanel />);
@@ -217,13 +268,28 @@ describe('PropertiesPanel clinical-note handlers', () => {
     fireEvent.click(screen.getByRole('button', { name: '+ Add Note' }));
     const noteInput = screen.getByPlaceholderText('Clinical note / condition');
     fireEvent.change(noteInput, { target: { value: 'Migraine' } });
-    fireEvent.change(screen.getByPlaceholderText('Age of onset (optional)'), {
+    fireEvent.change(screen.getByPlaceholderText(/^Age of onset \(optional\)/), {
       target: { value: '35' },
     });
     clickAddNear(noteInput);
 
     expect(current().conditions).toHaveLength(1);
     expect(current().conditions[0]).toMatchObject({ name: 'Migraine', ageOfOnset: 35 });
+  });
+
+  it('adds a note with an approximate age of onset', () => {
+    seedIndividual();
+    render(<PropertiesPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: '+ Add Note' }));
+    const noteInput = screen.getByPlaceholderText('Clinical note / condition');
+    fireEvent.change(noteInput, { target: { value: 'Migraine' } });
+    fireEvent.change(screen.getByPlaceholderText(/^Age of onset \(optional\)/), {
+      target: { value: '30s' },
+    });
+    clickAddNear(noteInput);
+
+    expect(current().conditions[0]).toMatchObject({ name: 'Migraine', ageOfOnset: '30s' });
   });
 
   it('adds a note without an age (ageOfOnset stays undefined)', () => {
@@ -253,8 +319,41 @@ describe('PropertiesPanel vital-status handlers', () => {
     seedIndividual();
     render(<PropertiesPanel />);
 
-    fireEvent.change(screen.getByPlaceholderText('Age'), { target: { value: '42' } });
+    fireEvent.change(screen.getByLabelText('Age'), { target: { value: '42' } });
     expect(current().age).toBe(42);
+  });
+
+  it('keeps an approximate age as typed instead of truncating it (#166)', () => {
+    seedIndividual({ vitalStatus: VitalStatus.Deceased });
+    render(<PropertiesPanel />);
+
+    const age = screen.getByLabelText('Age at death');
+    fireEvent.change(age, { target: { value: '60s' } });
+    expect(current().age).toBe('60s');
+    expect(age).toHaveValue('60s');
+
+    fireEvent.change(age, { target: { value: '~65' } });
+    expect(current().age).toBe('~65');
+
+    fireEvent.change(age, { target: { value: '' } });
+    expect(current().age).toBeUndefined();
+  });
+
+  it('shows a saved numeric age unchanged', () => {
+    seedIndividual({ age: 42 });
+    render(<PropertiesPanel />);
+    expect(screen.getByLabelText('Age')).toHaveValue('42');
+  });
+
+  it('marks a cause of death as uncertain (#166)', () => {
+    seedIndividual({ vitalStatus: VitalStatus.Deceased, causeOfDeath: 'stomach cancer' });
+    render(<PropertiesPanel />);
+
+    const box = screen.getByRole('checkbox', { name: /Uncertain/ });
+    fireEvent.click(box);
+    expect(current().causeOfDeathUncertain).toBe(true);
+    fireEvent.click(box);
+    expect(current().causeOfDeathUncertain).toBeUndefined();
   });
 
   it('sets a cause of death when deceased', () => {
@@ -339,7 +438,7 @@ describe('PropertiesPanel onboarding dismissal', () => {
     });
     render(<PropertiesPanel />);
 
-    fireEvent.change(screen.getByPlaceholderText('Age'), { target: { value: '42' } });
+    fireEvent.change(screen.getByLabelText('Age'), { target: { value: '42' } });
 
     expect(useUIStore.getState().onboarded).toBe(true);
   });

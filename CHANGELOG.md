@@ -27,6 +27,18 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   preserving any degree-of-relationship annotation.
 
 ### Added
+- Enter a diagnosis once (issue #170): ticking a condition for a person now
+  offers an optional **age at onset** right beside it (also in the
+  "+ Add Condition" form), drawn under the symbol as `Breast cancer (dx 39)` on
+  the canvas and in SVG/PDF export. Stored per person as
+  `Individual.conditionOnsets` (keyed by legend entry), pruned when the
+  condition is removed.
+- Approximate ages and cause of death (issue #166): Age / age at death (and ages
+  at onset) accept approximate values such as `60s`, `~65` or `?` and draw them
+  as typed (`d. 60s`) instead of silently truncating to a number. Cause of death
+  is now drawn under the symbol, with an **Uncertain** checkbox that prefixes
+  `?` (`?stomach cancer`). Whole-number ages are stored exactly as before, so
+  existing documents load and draw unchanged.
 - Individual-level childlessness: a person can be marked infertile or childless
   (no partner drawn) from their properties panel, drawn as a stub below the
   symbol ended by a double or single cross-bar — identical to the partnership
