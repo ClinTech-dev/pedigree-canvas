@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readPersistedDoc } from './support/harness';
-import { wideMultiFounderChart } from '../src/utils/__fixtures__/pedigrees';
+import { wideMultiFounderChart, birthOrderSibship } from '../src/utils/__fixtures__/pedigrees';
 
 /**
  * End-to-end guard for the "Reformat pedigree" action (issue #137, PR2).
@@ -108,5 +108,51 @@ test.describe('reformat pedigree', () => {
     const after = await readPersistedDoc(page);
     expect(after).not.toBeNull();
     expect(maxRowSpan(after!)).toBeLessThan(seededSpan);
+  });
+
+  test('clicking Reformat puts a sibship with known ages in birth order (#172)', async ({ page }) => {
+    const f = birthOrderSibship();
+    const fullDoc = {
+      metadata: {
+        id: 'birth-order-e2e',
+        title: 'birth-order-e2e',
+        createdAt: new Date(0).toISOString(),
+        updatedAt: new Date(0).toISOString(),
+        version: '1.0.0',
+      },
+      individuals: f.doc.individuals,
+      partnerships: f.doc.partnerships,
+      parentChildLinks: f.doc.parentChildLinks,
+      twinGroups: f.doc.twinGroups ?? {},
+      textAnnotations: {},
+      generationOrder: [],
+      legendConfig: { entries: [], position: { x: 50, y: 50 } },
+    };
+    await page.addInitScript(
+      ([autosaveKey, onboardedKey, docJson]) => {
+        window.localStorage.setItem(autosaveKey, docJson);
+        window.localStorage.setItem(onboardedKey, '1');
+      },
+      [AUTOSAVE_KEY, ONBOARDED_KEY, JSON.stringify(fullDoc)] as const,
+    );
+    await page.goto('/app/');
+    await page.waitForLoadState('networkidle');
+
+    const siblings = ['c11', 'c14', 'cu', 'ta', 'tb', 'c20', 'cd'];
+    const leftToRight = (doc: { individuals: Record<string, unknown> }): string[] => {
+      const x = (id: string) =>
+        (doc.individuals[id] as { position: { x: number } }).position.x;
+      return [...siblings].sort((a, b) => x(a) - x(b));
+    };
+    // The seed is the persona's out-of-order sibship (son 11 left of sister 14).
+    expect(leftToRight((await readPersistedDoc(page))!)[0]).toBe('c11');
+
+    await page.getByRole('button', { name: 'Reformat pedigree', exact: true }).click();
+    await expect
+      .poll(async () => {
+        const doc = await readPersistedDoc(page);
+        return doc ? leftToRight(doc).join(',') : '';
+      }, { timeout: 10_000 })
+      .toBe('c20,c14,cu,c11,ta,tb,cd');
   });
 });

@@ -139,7 +139,16 @@ reorder** rows, and fixes both #137 symptoms by construction:
    iterated, **row-size-normalised barycentre** of their cross-row neighbours. A
    no-neighbour founder spouse is skipped from the barycentre (it would otherwise
    skew the chain). This drops a cross-branch couple *between* its two families
-   and keeps a hub's spouses straddling it.
+   and keeps a hub's spouses straddling it. After every row reorder (and again
+   after twin contiguity) `orderSibshipsByBirth` puts each sibship with two or
+   more known ages / dates of birth into **birth order, oldest left** (Bennett;
+   issue #172): the sibship's chains are permuted among the slots they already
+   hold, starting from the user's seed order, so unknown-age siblings keep their
+   place and a twin group moves as one unit. A sibling tethered to another family
+   (a cross-branch couple at or below it) and every sibship in a family with a
+   married twin or 3+-union hub (residual 1b) are left to the barycentre. The
+   pure comparison helpers live in `src/utils/birthOrder.ts`; the invariant is
+   `siblingBirthOrder`.
 3. **Coordinates** — pack each row tightly (partners at `PARTNER_SPACING`,
    otherwise `minGap`), then rigidly align rows over their neighbours. Because the
    invariants never require x-*centring* of parents over children (only correct

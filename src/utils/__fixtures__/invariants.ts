@@ -13,6 +13,7 @@ import {
 } from '../treeLayout';
 import type { LayoutDoc, LayoutSpacing } from '../treeLayout';
 import { SYMBOL_SIZE, MIN_GENERATION_NODE_SPACING } from '../constants';
+import { birthKey, residualHubFamilies, tetheredIndividuals, unitBirthKey } from '../birthOrder';
 
 // ---------------------------------------------------------------------------
 // Exported types
@@ -777,6 +778,141 @@ export function twinContiguity(
         ids: [gid, ...group.individualIds],
         detail: `non-twin siblings [${nonMembersInRun.join(',')}] sit between twin members`,
       });
+    }
+  }
+
+  return { ok: violations.length === 0, violations };
+}
+
+/**
+ * Assert that every sibship reads in **birth order, oldest left** (Bennett/NSGC;
+ * issue #172) wherever the order is known: for two siblings of one union whose
+ * birth keys ({@link birthKey} — date of birth, else the age of a living
+ * individual) are both known and differ, the older sits strictly to the left.
+ *
+ * Unknown-age siblings are unconstrained. A twin group is one unit: each member
+ * takes the group's earliest known key and pairs within a group are skipped.
+ *
+ * ### Achievable form
+ * A sibling whose same-row partner component (it, its spouses, their spouses…)
+ * also contains a **different** sibling of the same sibship — a consanguineous
+ * sib-union — is exempt (with its whole twin group): the couple must stay
+ * adjacent, so the two cannot be ordered independently. Likewise a sibling
+ * whose component holds a **load-bearing spouse** from outside the sibship (one
+ * with parents of their own in the chart — a cross-branch couple) is exempt:
+ * that couple's place is set by two families at once, and `reformatLayout`
+ * holds it in place rather than drag it away from the other family. The same
+ * holds when the cross-branch couple is further down the sibling's line of
+ * descent (`tetheredIndividuals` in `birthOrder.ts`). A whole family holding a
+ * **married twin** or a **3+-union hub** (the open residual-1b shapes, #149 / #159) is
+ * exempt too (`residualHubFamilies`).
+ *
+ * Not part of {@link checkAllInvariants}: the order-preserving per-edit engine
+ * deliberately keeps the user's arrangement, so this is asserted explicitly
+ * against `reformatLayout` (and the store's birth-order placement).
+ *
+ * @param now - Reference time for age → birth estimates (default: now).
+ */
+export function siblingBirthOrder(
+  pos: Positions,
+  doc: LayoutDoc,
+  now: number = Date.now(),
+): InvariantResult {
+  const violations: Violation[] = [];
+  const rowTol = 1;
+  const twinGroups = doc.twinGroups ?? {};
+
+  // Unit label (twin group id or own id) and unit birth key per individual.
+  const label = new Map<string, string>();
+  const key = new Map<string, number | null>();
+  for (const id of Object.keys(doc.individuals)) {
+    label.set(id, id);
+    key.set(id, birthKey(doc.individuals[id], now));
+  }
+  for (const g of Object.values(twinGroups)) {
+    const members = g.individualIds.filter((id) => id in doc.individuals);
+    if (members.length < 2) continue;
+    const k = unitBirthKey(members.map((id) => key.get(id) ?? null));
+    for (const id of members) {
+      label.set(id, g.id);
+      key.set(id, k);
+    }
+  }
+
+  // Same-row partner adjacency (partners placed on the same row).
+  const partnersOf = new Map<string, Set<string>>();
+  for (const u of Object.values(doc.partnerships)) {
+    const a = u.partner1Id;
+    const b = u.partner2Id;
+    if (!a || !b || a === b || !(a in pos) || !(b in pos)) continue;
+    if (Math.abs(pos[a].y - pos[b].y) > rowTol) continue;
+    (partnersOf.get(a) ?? partnersOf.set(a, new Set()).get(a)!).add(b);
+    (partnersOf.get(b) ?? partnersOf.set(b, new Set()).get(b)!).add(a);
+  }
+  // Has at least one present parent (a child link to a union with a present partner).
+  const withParents = new Set<string>();
+  for (const l of Object.values(doc.parentChildLinks)) {
+    const u = doc.partnerships[l.parentPartnershipId];
+    if (!u) continue;
+    if ([u.partner1Id, u.partner2Id].some((p) => !!p && p in doc.individuals)) {
+      withParents.add(l.childId);
+    }
+  }
+  const hasParents = (id: string): boolean => withParents.has(id);
+  const tethered = tetheredIndividuals(doc);
+  const residualFamily = residualHubFamilies(doc);
+
+  const componentOf = (start: string): Set<string> => {
+    const seen = new Set<string>([start]);
+    const stack = [start];
+    while (stack.length) {
+      const cur = stack.pop()!;
+      for (const q of partnersOf.get(cur) ?? []) {
+        if (!seen.has(q)) {
+          seen.add(q);
+          stack.push(q);
+        }
+      }
+    }
+    return seen;
+  };
+
+  for (const [uid, children] of siblingsOf(doc)) {
+    const present = children.filter((id) => id in pos);
+    if (present.length < 2) continue;
+    const sibSet = new Set(present);
+    const exempt = new Set<string>();
+    for (const id of present) {
+      for (const other of componentOf(id)) {
+        if (other === id) continue;
+        if (sibSet.has(other) ? label.get(other) !== label.get(id) : hasParents(other)) {
+          exempt.add(id);
+        }
+      }
+    }
+    // A cross-branch couple further down a sibling's line tethers it the same way.
+    for (const id of present) if (tethered.has(id)) exempt.add(id);
+    // A family holding a married twin or 3+-union hub (residual 1b) is not birth-ordered.
+    if (present.some((id) => residualFamily.has(id))) continue;
+    // A twin group is one unit: one exempt member exempts the whole group.
+    const exemptLabels = new Set([...exempt].map((id) => label.get(id)));
+    for (const id of present) if (exemptLabels.has(label.get(id))) exempt.add(id);
+
+    for (const a of present) {
+      for (const b of present) {
+        if (a === b || exempt.has(a) || exempt.has(b)) continue;
+        if (label.get(a) === label.get(b)) continue;
+        const ka = key.get(a) ?? null;
+        const kb = key.get(b) ?? null;
+        if (ka === null || kb === null || !(ka < kb)) continue;
+        if (!(pos[a].x < pos[b].x)) {
+          violations.push({
+            rule: 'siblingBirthOrder',
+            ids: [uid, a, b],
+            detail: `${a} is older than ${b} but sits at x=${pos[a].x.toFixed(1)} ≥ ${pos[b].x.toFixed(1)}`,
+          });
+        }
+      }
     }
   }
 

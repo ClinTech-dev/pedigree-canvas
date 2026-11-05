@@ -89,7 +89,9 @@ hope.
    couples stay adjacent (`buildChains`), then order the chains by an iterated,
    row-size-normalised **barycentre** of their cross-row neighbours. This drops a
    cross-branch couple *between* its two families and keeps a hub straddled by its
-   spouses.
+   spouses. Each sibship whose ages or dates of birth are known is then held in
+   **birth order, oldest left** (Bennett; issue #172) — unknown-age siblings keep
+   their place, twins move as one unit.
 3. **Coordinate** — pack each row tightly, then reconcile subtrees. Plain
    families are re-tidied through `computeTreeLayout`'s contour separation;
    a lone cross-branch couple gets a purpose-built coordinate phase
@@ -143,10 +145,19 @@ achieves:
 | `boundedPartnerDistance` | A cross-branch couple is no wider than `maxFactor × partnerSpacing`. |
 | `chartWidth` | No row spans more than `maxFactor × (n−1) × minSpacing` — bounds overall width. |
 | `manualOrderPreserved` | A re-tidy keeps the user's left-to-right sibling order. |
+| `siblingBirthOrder` | Where two siblings' ages / dates of birth are both known, the older is on the left. *(Achievable form: a sibling tethered to another family by a cross-branch couple, and families holding a married twin or 3+-union hub, are exempt.)* |
 | `anchorStability` | The anchor individual doesn't jump on relayout. |
 
-`checkAllInvariants` runs the six positional invariants together; `twinContiguity`
-and the order/anchor rules take extra inputs and are called explicitly.
+`checkAllInvariants` runs the six positional invariants together; `twinContiguity`,
+`siblingBirthOrder` and the order/anchor rules are called explicitly
+(`siblingBirthOrder` is asserted against `reformatLayout`, since the per-edit
+engine deliberately preserves the user's order).
+
+**Per-edit birth order.** `computeTreeLayout` stays order-preserving. A new
+sibling is still appended on the right (its age isn't known yet); when an age is
+committed in the Properties panel (on blur), or a child is inserted with a known
+age, `birthOrderPlacement` ([`src/utils/birthOrderPlacement.ts`](../src/utils/birthOrderPlacement.ts))
+slides the sibship into birth order before the normal relayout — one undo step.
 
 ### "Achievable form" — why two rules were redefined
 

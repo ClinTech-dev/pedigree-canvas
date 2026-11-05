@@ -24,6 +24,7 @@ import {
   type LayoutDoc,
 } from '../utils/treeLayout';
 import { reformatLayout } from '../utils/reformatLayout';
+import { birthOrderPlacement } from '../utils/birthOrderPlacement';
 import { commonSibshipId } from '../utils/sibship';
 import { twinGroupsTouching, pickSurvivingTwinGroup } from '../utils/twinGrouping';
 
@@ -306,6 +307,13 @@ interface PedigreeState {
    * User-triggered only; never runs automatically on load.
    */
   reformatDocument: () => void;
+  /**
+   * Put `id`'s sibship into birth order, oldest left (issue #172), then re-tidy
+   * the family. Called when an age is committed (Properties panel blur), so the
+   * sibship is not reshuffled on every keystroke. Unknown-age siblings keep
+   * their place. A no-op — no `set`, no undo entry — when already in order.
+   */
+  placeInBirthOrder: (id: string) => void;
 }
 
 type PartializedState = Pick<PedigreeState, 'document'>;
@@ -1046,7 +1054,15 @@ export const usePedigreeStore = create<PedigreeState>()(
             ...state.document.individuals,
             [child.id]: child,
           };
-          individuals = relayoutFamily({ individuals, partnerships, parentChildLinks, twinGroups: state.document.twinGroups }, child.id);
+          // A child inserted with a known age / date of birth goes to its
+          // birth-order slot (issue #172); an unknown-age child stays where the
+          // caller put it (the right end), as before.
+          const twinGroups = state.document.twinGroups;
+          individuals = applyPositions(
+            individuals,
+            birthOrderPlacement({ individuals, partnerships, parentChildLinks, twinGroups }, child.id),
+          );
+          individuals = relayoutFamily({ individuals, partnerships, parentChildLinks, twinGroups }, child.id);
           return {
             document: {
               ...state.document,
@@ -1352,6 +1368,35 @@ export const usePedigreeStore = create<PedigreeState>()(
             individuals: applyPositions(state.document.individuals, positions),
           },
         }));
+      },
+
+      placeInBirthOrder: (id) => {
+        const { document: doc } = get();
+        // Compute first so an already-ordered sibship never fires `set`.
+        const layoutDoc: LayoutDoc = {
+          individuals: doc.individuals,
+          partnerships: doc.partnerships,
+          parentChildLinks: doc.parentChildLinks,
+          twinGroups: doc.twinGroups,
+        };
+        const placed = birthOrderPlacement(layoutDoc, id);
+        if (Object.keys(placed).length === 0) return;
+        set((state) => {
+          const individuals = relayoutFamily(
+            { ...layoutDoc, individuals: applyPositions(state.document.individuals, placed) },
+            id,
+          );
+          return {
+            document: {
+              ...state.document,
+              metadata: {
+                ...state.document.metadata,
+                updatedAt: new Date().toISOString(),
+              },
+              individuals,
+            },
+          };
+        });
       },
     }),
     {

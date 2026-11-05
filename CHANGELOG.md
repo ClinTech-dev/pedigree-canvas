@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- Siblings now follow Bennett birth order, oldest on the left, wherever ages or
+  dates of birth are known (issue #172). Reformat orders each such sibship
+  oldest-left, and committing an age in the Properties panel (or adding a child
+  with a known age) slides the person to their birth-order slot as one undo step.
+  Siblings with no age, an age that can't be read (e.g. "60s"), or only an age at
+  death keep their place; twins move together.
 - The repository moved to `ClinTech-dev/pedigree-canvas`; links now point there.
 - Pedigree Canvas now carries the ClinTech family brand: Ward Green and sage
   neutrals replace Clinical Indigo and the cool greys across the editor, landing

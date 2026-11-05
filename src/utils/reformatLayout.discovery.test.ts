@@ -8,6 +8,7 @@ import {
   checkAllInvariants,
   noNodeBetweenPartners,
   twinContiguity,
+  siblingBirthOrder,
 } from './__fixtures__/invariants';
 
 /** Apply reformat moves back onto the doc (for the idempotence check). */
@@ -37,6 +38,7 @@ describe.skipIf(!process.env.REFORMAT_DISCOVERY)('reformatLayout — discovery (
         expect(checkAllInvariants(pos, doc).violations).toEqual([]);
         expect(noNodeBetweenPartners(pos, doc).ok).toBe(true);
         expect(twinContiguity(pos, doc, doc.twinGroups ?? {}).ok).toBe(true);
+        expect(siblingBirthOrder(pos, doc).violations).toEqual([]);
         const settled = settle(doc, reformatLayout(doc));
         const twice = reformatLayout(settled);
         for (const [id, p] of Object.entries(twice)) {
